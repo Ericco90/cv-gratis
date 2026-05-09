@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Builder Premium - Buat CV Profesional dalam 5 Menit</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- PDF & Canvas Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+                        playfair: ['Playfair Display', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        gold: '#D4AF37',
+                        premium: {
+                            50: '#f8f9fa',
+                            100: '#e9ecef',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles & Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .dark .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+        }
+
+        /* CV Paper specific scale - STRICT A4 */
+        .cv-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+            background: #e2e8f0;
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+        }
+        .dark .cv-wrapper { background: #020617; }
+
+        .cv-page {
+            width: 210mm;
+            height: 297mm; /* Strict A4 Height */
+            background: white;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+            transform-origin: top center;
+            overflow: hidden; /* Hide overflow to maintain A4 boundary */
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        /* Premium Textures & Motifs */
+        .bg-paper {
+            background-color: #ffffff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23000000' fill-opacity='0.02' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+        }
+        .bg-cream-paper {
+            background-color: #fcfbf9;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3E%3Cg fill='%23000000' fill-opacity='0.03'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .bg-dots {
+            background-image: radial-gradient(rgba(0,0,0,0.08) 1.5px, transparent 1.5px);
+            background-size: 20px 20px;
+        }
+        .bg-grid {
+            background-size: 30px 30px;
+            background-image: 
+                linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px);
+        }
+
+        /* Input animations */
+        .input-group { position: relative; margin-bottom: 1.5rem; }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 0.75rem 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #cbd5e1;
+            outline: none;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+            color: inherit;
+        }
+        .dark .input-group input, .dark .input-group textarea { border-bottom-color: #475569; }
+        .input-group input:focus, .input-group textarea:focus { border-bottom-color: #3b82f6; }
+        .input-group label {
+            position: absolute;
+            top: 0.75rem;
+            left: 0;
+            color: #64748b;
+            transition: all 0.3s;
+            pointer-events: none;
+            font-size: 0.95rem;
+        }
+        .input-group input:focus ~ label, .input-group input:not(:placeholder-shown) ~ label,
+        .input-group textarea:focus ~ label, .input-group textarea:not(:placeholder-shown) ~ label {
+            top: -12px;
+            font-size: 0.75rem;
+            color: #3b82f6;
+        }
+
+        /* Drag & Drop zone */
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s;
+        }
+        .drop-zone.dragover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .dark .drop-zone { border-color: #475569; }
+        
+        /* Print Styles */
+        @media print {
+            body * { visibility: hidden; }
+            #cv-preview, #cv-preview * { visibility: visible; }
+            #cv-preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 210mm;
+                height: 297mm;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            .no-print { display: none !important; }
+            .watermark-text { display: block !important; }
+        }
+
+        .cv-photo { transition: border-radius 0.3s ease; object-fit: cover; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-premium-950 dark:text-slate-200 transition-colors duration-300 font-sans">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 glass no-print transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="showLanding()">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold font-jakarta shadow-lg shadow-blue-500/30">
+                        CV
+                    </div>
+                    <span class="font-jakarta font-bold text-xl tracking-tight">Builder <span class="text-gold font-medium">Premium</span></span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Tombol Reset khusus untuk Anda (Pemilik) mengetes -->
+                    <button onclick="resetPremium()" class="text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/30 px-3 py-1.5 rounded-full hover:bg-red-100 transition-colors">
+                        Reset ke Gratis (Test)
+                    </button>
+                    
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                        <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+                        <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-yellow-400"></i>
+                    </button>
+                    <button id="nav-cta" onclick="startApp()" class="bg-slate-900 dark:bg-white dark:text-slate-900 text-white px-5 py-2 rounded-full text-sm font-medium hover:scale-105 transition-transform shadow-lg shadow-slate-900/20">
+                        Buat CV Sekarang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- LANDING PAGE SECTION -->
+    <div id="landing-page" class="animate-fade-in pt-16">
+        <!-- Hero Section -->
+        <section class="relative overflow-hidden pt-20 pb-32">
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-[0.05]"></div>
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+            <div class="absolute top-32 -left-24 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-medium mb-6 animate-slide-up">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                    </span>
+                    Telah digunakan oleh 10,000+ Profesional
+                </div>
+                <h1 class="text-5xl md:text-7xl font-jakarta font-extrabold tracking-tight mb-6 animate-slide-up" style="animation-delay: 0.1s">
+                    Buat CV <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">Profesional</span><br>Dalam 5 Menit.
+                </h1>
+                <p class="mt-4 text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-10 animate-slide-up" style="animation-delay: 0.2s">
+                    Aplikasi pembuat CV otomatis dengan 13+ desain bergelombang elegan. Tingkatkan peluang Anda diterima kerja di perusahaan impian.
+                </p>
+                <div class="flex justify-center gap-4 animate-slide-up" style="animation-delay: 0.3s">
+                    <button onclick="startApp()" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full font-semibold text-lg shadow-xl shadow-blue-500/30 hover:-translate-y-1 transition-all flex items-center gap-2">
+                        Mulai Buat CV Gratis <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preview Image Hero -->
+            <div class="mt-16 max-w-5xl mx-auto px-4 animate-slide-up" style="animation-delay: 0.4s">
+                <div class="rounded-2xl glass-panel p-2 shadow-2xl overflow-hidden border border-white/50">
+                    <div class="aspect-video bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden relative group cursor-pointer" onclick="startApp()">
+                        <!-- Ganti link src di bawah ini dengan link gambar banner / hasil CV jualan Anda -->
+                        <img src="image/cv.png" alt="Preview CV Premium" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                        
+                        <!-- Overlay saat gambar di-hover -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent flex items-end justify-center pb-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <span class="bg-white text-slate-900 px-6 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg">
+                                Buat CV Seperti Ini Sekarang <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-24 bg-white dark:bg-premium-900 transition-colors">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-jakarta font-bold mb-4">Investasi Untuk Karir Anda</h2>
+                    <p class="text-slate-600 dark:text-slate-400">Pilih paket yang sesuai dengan kebutuhan profesional Anda.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Free -->
+                    <div class="glass-panel rounded-3xl p-8 border hover:border-blue-500 transition-colors flex flex-col">
+                        <h3 class="text-xl font-semibold mb-2">Basic</h3>
+                        <div class="text-4xl font-bold mb-6">Gratis</div>
+                        <ul class="space-y-4 mb-8 text-slate-600 dark:text-slate-400 flex-1">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> 1 Template Standar</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> Export PDF (Watermark)</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> Auto Save Local</li>
+                        </ul>
+                        <button onclick="startApp()" class="w-full py-3 rounded-xl bg-slate-100 dark:bg-slate-800 font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors mt-auto">Mulai Gratis</button>
+                    </div>
+
+                    <!-- Premium -->
+                    <div class="glass-panel rounded-3xl p-8 border-2 border-blue-500 relative transform md:-translate-y-4 shadow-2xl flex flex-col">
+                        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold animate-pulse-slow">Paling Populer</div>
+                        <h3 class="text-xl font-semibold mb-2">Premium</h3>
+                        <div class="text-4xl font-bold mb-2 text-blue-600 dark:text-blue-400">Rp 10.000 <span class="text-sm font-normal text-slate-500">/sekali bayar</span></div>
+                        <ul class="space-y-4 mb-8 text-slate-600 dark:text-slate-400 mt-6 flex-1">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-5 h-5 text-blue-500"></i> 13 Template VIP (Wavy Shape)</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-5 h-5 text-blue-500"></i> Tanpa Watermark</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-5 h-5 text-blue-500"></i> Export PDF & PNG Resolusi Tinggi</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-5 h-5 text-blue-500"></i> Custom Warna Bebas</li>
+                        </ul>
+                        <button onclick="showUpsell()" class="w-full py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30 mt-auto">Upgrade Premium</button>
+                    </div>
+
+                    <!-- Pro -->
+                    <div class="glass-panel rounded-3xl p-8 border hover:border-gold transition-colors flex flex-col">
+                        <h3 class="text-xl font-semibold mb-2 flex items-center gap-2">Pro <i data-lucide="crown" class="w-5 h-5 text-gold"></i></h3>
+                        <div class="text-4xl font-bold mb-6 text-gold">Rp 25.000 <span class="text-sm font-normal text-slate-500">/sekali bayar</span></div>
+                        <ul class="space-y-4 mb-8 text-slate-600 dark:text-slate-400 flex-1">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-5 h-5 text-gold"></i> Semua Fitur Premium</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-5 h-5 text-gold"></i> Review CV oleh HR Professional</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-5 h-5 text-gold"></i> Prioritas Support VIP via WA</li>
+                        </ul>
+                        <button onclick="showUpsell()" class="w-full py-3 rounded-xl bg-slate-900 dark:bg-white dark:text-slate-900 text-white font-medium hover:bg-slate-800 transition-colors mt-auto">Dapatkan Pro</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="bg-slate-50 dark:bg-premium-950 py-12 text-center border-t border-slate-200 dark:border-slate-800">
+            <p class="text-slate-500 font-jakarta">© 2026 CV Builder Premium. Powered by Studio Jasa Digital.</p>
+        </footer>
+    </div>
+
+    <!-- APP SECTION (Hidden default) -->
+    <div id="app-container" class="hidden flex-col md:flex-row min-h-screen pt-16 bg-slate-100 dark:bg-premium-900 transition-colors animate-fade-in">
+        
+        <!-- Left Sidebar: Form Inputs -->
+        <aside class="w-full md:w-[400px] lg:w-[450px] bg-white dark:bg-premium-950 border-r border-slate-200 dark:border-slate-800 flex-shrink-0 flex flex-col h-[calc(100vh-4rem)] overflow-hidden shadow-2xl z-10">
+            
+            <!-- Progress Bar -->
+            <div class="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-premium-900">
+                <div class="flex justify-between text-xs font-medium mb-1">
+                    <span>Kelengkapan CV</span>
+                    <span id="progress-text" class="text-blue-600">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
+                    <div id="progress-bar" class="bg-blue-600 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Form Tabs Wrapper -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-8 scroll-smooth" id="form-scroll">
+                
+                <!-- Personal Info -->
+                <section>
+                    <h3 class="text-lg font-jakarta font-semibold flex items-center gap-2 mb-4">
+                        <i data-lucide="user" class="w-5 h-5 text-blue-500"></i> Info Pribadi
+                    </h3>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2 text-slate-600 dark:text-slate-400">Foto Profil</label>
+                        <div class="drop-zone rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800" id="photo-dropzone">
+                            <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mb-2"></i>
+                            <span class="text-sm font-medium">Drag & Drop foto atau Klik disini</span>
+                            <span class="text-xs text-slate-500 mt-1">Rekomendasi: Rasio 1:1, Max 2MB</span>
+                            <input type="file" id="photo-upload" class="hidden" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <input type="text" id="cv-name" placeholder=" " oninput="updateData('personal', 'name', this.value)">
+                            <label>Nama Lengkap</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="cv-title" placeholder=" " oninput="updateData('personal', 'title', this.value)">
+                            <label>Posisi / Profesi</label>
+                        </div>
+                        <div class="input-group">
+                            <textarea id="cv-about" rows="3" placeholder=" " oninput="updateData('personal', 'about', this.value)"></textarea>
+                            <label>Tentang Saya (Ringkasan)</label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="input-group">
+                                <input type="email" id="cv-email" placeholder=" " oninput="updateData('personal', 'email', this.value)">
+                                <label>Email</label>
+                            </div>
+                            <div class="input-group">
+                                <input type="tel" id="cv-phone" placeholder=" " oninput="updateData('personal', 'phone', this.value)">
+                                <label>No HP</label>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="cv-address" placeholder=" " oninput="updateData('personal', 'address', this.value)">
+                            <label>Alamat / Kota</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="cv-web" placeholder=" " oninput="updateData('personal', 'web', this.value)">
+                            <label>LinkedIn / Website (Opsional)</label>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="border-slate-200 dark:border-slate-800">
+
+                <!-- Experience -->
+                <section>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-jakarta font-semibold flex items-center gap-2">
+                            <i data-lucide="briefcase" class="w-5 h-5 text-blue-500"></i> Pengalaman Kerja
+                        </h3>
+                        <button onclick="addListItem('experience')" class="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah
+                        </button>
+                    </div>
+                    <div id="experience-list" class="space-y-4">
+                        <!-- Experience items injected here -->
+                    </div>
+                </section>
+
+                <hr class="border-slate-200 dark:border-slate-800">
+
+                <!-- Education -->
+                <section>
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-jakarta font-semibold flex items-center gap-2">
+                            <i data-lucide="graduation-cap" class="w-5 h-5 text-blue-500"></i> Pendidikan
+                        </h3>
+                        <button onclick="addListItem('education')" class="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                            <i data-lucide="plus-circle" class="w-4 h-4"></i> Tambah
+                        </button>
+                    </div>
+                    <div id="education-list" class="space-y-4">
+                        <!-- Education items injected here -->
+                    </div>
+                </section>
+                
+                <hr class="border-slate-200 dark:border-slate-800">
+
+                <!-- Skills & Others -->
+                <section>
+                    <h3 class="text-lg font-jakarta font-semibold flex items-center gap-2 mb-4">
+                        <i data-lucide="award" class="w-5 h-5 text-blue-500"></i> Keahlian & Lainnya
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <input type="text" id="cv-skills" placeholder=" " oninput="updateListStr('skills', this.value)">
+                            <label>Skill (Pisahkan dengan koma)</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="cv-languages" placeholder=" " oninput="updateListStr('languages', this.value)">
+                            <label>Bahasa (Pisahkan dengan koma)</label>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </aside>
+
+        <!-- Right Main Area: Live Preview & Toolbar -->
+        <main class="flex-1 flex flex-col h-[calc(100vh-4rem)] relative bg-[#e2e8f0] dark:bg-[#020617] transition-colors overflow-hidden">
+            
+            <!-- Toolbar -->
+            <div class="h-16 bg-white dark:bg-premium-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 flex-shrink-0 z-20 shadow-sm w-full">
+                
+                <div class="flex items-center gap-4 flex-1 overflow-hidden">
+                    <!-- Template Selector (Scrollable) -->
+                    <div class="flex overflow-x-auto no-scrollbar bg-slate-100 dark:bg-slate-800 p-1 rounded-lg mr-4 flex-shrink-0 max-w-[60%] lg:max-w-[70%]" style="scroll-behavior: smooth;">
+                        <button onclick="changeTemplate('minimalist')" id="btn-tpl-minimalist" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap bg-white dark:bg-slate-700 shadow-sm transition-all">Minimalist</button>
+                        
+                        <!-- 3 TEMPLATE BARU DARI GAMBAR -->
+                        <button onclick="changeTemplate('wave1')" id="btn-tpl-wave1" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Wave Teal <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <button onclick="changeTemplate('wave2')" id="btn-tpl-wave2" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Wave Orange <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <button onclick="changeTemplate('wave3')" id="btn-tpl-wave3" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Wave Pink <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <!-- End 3 Template Baru -->
+
+                        <button onclick="changeTemplate('creative')" id="btn-tpl-creative" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Creative <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <button onclick="changeTemplate('dark')" id="btn-tpl-dark" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Dark <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <button onclick="changeTemplate('corporate')" id="btn-tpl-corporate" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Corporate <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <button onclick="changeTemplate('tech')" id="btn-tpl-tech" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">SaaS Tech <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <button onclick="changeTemplate('executive')" id="btn-tpl-executive" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Executive <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <button onclick="changeTemplate('split')" id="btn-tpl-split" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Split Bold <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <button onclick="changeTemplate('developer')" id="btn-tpl-developer" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Developer <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <button onclick="changeTemplate('academic')" id="btn-tpl-academic" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Academic <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                        <button onclick="changeTemplate('startup')" id="btn-tpl-startup" class="px-3 py-1.5 text-sm rounded-md font-medium whitespace-nowrap text-slate-500 hover:text-slate-800 dark:text-slate-400 transition-all flex items-center gap-1.5">Startup Vibe <i data-lucide="lock" class="w-3 h-3 text-gold lock-icon hidden"></i></button>
+                    </div>
+
+                    <!-- Theme Color -->
+                    <div class="flex items-center gap-2 border-l border-slate-200 dark:border-slate-700 pl-4 flex-shrink-0">
+                        <button onclick="changeColor('#008080')" class="w-6 h-6 rounded-full ring-2 ring-offset-2 ring-transparent focus:ring-[#008080]" style="background-color: #008080;" title="Teal"></button>
+                        <button onclick="changeColor('#f97316')" class="w-6 h-6 rounded-full hover:scale-110 transition-transform relative group" style="background-color: #f97316;" title="Orange">
+                            <i data-lucide="lock" class="w-3 h-3 absolute -top-1 -right-1 text-gold lock-icon hidden"></i>
+                        </button>
+                        <button onclick="changeColor('#ec4899')" class="w-6 h-6 rounded-full hover:scale-110 transition-transform relative group" style="background-color: #ec4899;" title="Pink">
+                            <i data-lucide="lock" class="w-3 h-3 absolute -top-1 -right-1 text-gold lock-icon hidden"></i>
+                        </button>
+                        <button onclick="changeColor('#3b82f6')" class="w-6 h-6 rounded-full bg-blue-500 hover:scale-110 transition-transform relative group">
+                            <i data-lucide="lock" class="w-3 h-3 absolute -top-1 -right-1 text-gold lock-icon hidden"></i>
+                        </button>
+                        <button onclick="changeColor('#0f172a')" class="w-6 h-6 rounded-full bg-slate-900 border border-slate-400 hover:scale-110 transition-transform relative">
+                            <i data-lucide="lock" class="w-3 h-3 absolute -top-1 -right-1 text-gold lock-icon hidden"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 ml-4 flex-shrink-0">
+                    <button onclick="exportPNG()" class="p-2 text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors tooltip relative" title="Download PNG">
+                        <i data-lucide="image" class="w-5 h-5"></i>
+                        <i data-lucide="lock" class="w-3 h-3 absolute -top-1 -right-1 text-gold lock-icon hidden"></i>
+                    </button>
+                    <button onclick="window.print()" class="p-2 text-slate-600 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors tooltip" title="Print CV">
+                        <i data-lucide="printer" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="exportPDF()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-lg shadow-blue-500/20 transition-all whitespace-nowrap">
+                        <i data-lucide="download" class="w-4 h-4"></i> Download
+                    </button>
+                </div>
+            </div>
+
+            <!-- CV Preview Area -->
+            <div class="cv-wrapper" id="cv-wrapper-scroll">
+                <div class="scale-wrapper" style="transform: scale(1); transform-origin: top center; margin-bottom: 2rem;">
+                    <!-- A4 Page Size Container -->
+                    <div id="cv-preview" class="cv-page text-slate-900">
+                        <!-- Rendered CV Content Goes Here -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- UPSELL & AKTIVASI MODAL -->
+    <div id="upsell-modal" class="fixed inset-0 z-[100] hidden items-center justify-center">
+        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeUpsell()"></div>
+        <div class="glass-panel relative z-10 w-full max-w-lg rounded-3xl p-8 shadow-2xl animate-slide-up transform border border-white/20">
+            <button onclick="closeUpsell()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-slate-100 dark:bg-slate-800 p-2 rounded-full">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="flex items-center gap-4 mb-6 border-b border-slate-200 dark:border-slate-700 pb-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-gold to-yellow-600 rounded-2xl flex items-center justify-center shadow-lg shadow-yellow-500/30 flex-shrink-0">
+                    <i data-lucide="crown" class="w-8 h-8 text-white"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-jakarta font-bold text-slate-900 dark:text-white leading-tight">Upgrade Premium</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Buka 13+ Template Wavy VIP & Tanpa Watermark</p>
+                </div>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Langkah 1 -->
+                <div class="bg-blue-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-blue-100 dark:border-slate-700 relative">
+                    <div class="absolute -top-3 -left-3 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold shadow-md">1</div>
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-2 text-lg flex justify-between items-center">
+                        Pembayaran
+                        <span class="text-blue-600 dark:text-blue-400 font-black">Rp 10.000</span>
+                    </h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">Lakukan pembayaran via Transfer Bank / E-Wallet dan kirimkan bukti transfer ke Admin untuk mendapatkan Kode Akses.</p>
+                    <button onclick="contactAdmin()" class="w-full py-3 bg-[#25D366] text-white rounded-xl font-bold hover:bg-[#1EBE57] transition-all shadow-lg shadow-green-500/30 flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.305-.885-.653-1.482-1.459-1.655-1.758-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+                        Hubungi Admin (WhatsApp)
+                    </button>
+                </div>
+
+                <!-- Langkah 2 -->
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 relative shadow-sm">
+                    <div class="absolute -top-3 -left-3 w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold shadow-md">2</div>
+                    <h4 class="font-bold text-slate-900 dark:text-white mb-3 text-lg">Aktivasi Kode</h4>
+                    <p class="text-xs text-slate-500 mb-3">Masukkan kode rahasia yang diberikan oleh Admin setelah pembayaran berhasil.</p>
+                    
+                    <div class="flex gap-2">
+                        <input type="text" id="premium-code" placeholder="Misal: CVPRO-XYZ..." class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-bold uppercase tracking-widest focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                        <button onclick="verifyCode()" class="bg-slate-900 dark:bg-white dark:text-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:scale-105 transition-transform whitespace-nowrap">
+                            Aktifkan
+                        </button>
+                    </div>
+                    <p id="error-msg" class="text-red-500 text-xs mt-2 hidden font-medium flex items-center gap-1"><i data-lucide="alert-circle" class="w-3 h-3"></i> Kode tidak valid atau salah.</p>
+                </div>
+            </div>
+            
+            <p class="text-center text-[10px] text-slate-400 mt-6 font-medium uppercase tracking-widest">Pembayaran 1x, akses selamanya di perangkat ini.</p>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Init Icons
+        lucide.createIcons();
+
+        // KODE RAHASIA & NOMOR WA (BISA ANDA GANTI)
+        const ADMIN_WA_NUMBER = "6285641612901"; // Nomor WA Admin terupdate
+        const SECRET_PREMIUM_CODE = "PRO2026CV"; // Ganti dengan kode rahasia buatan Anda
+
+        // State Management
+        let isPremium = false; 
+        
+        if (localStorage.getItem('cvPremiumStatus') === 'true') {
+            isPremium = true;
+        }
+
+        // FUNGSI RESET UNTUK TESTING
+        function resetPremium() {
+            isPremium = false;
+            localStorage.removeItem('cvPremiumStatus');
+            localStorage.removeItem('cvPremiumUnlocked'); 
+            cvData.settings.template = 'minimalist';
+            saveLocal();
+            alert("Status dikembalikan ke Paket GRATIS. Silakan tes klik tema premium sekarang.");
+            location.reload();
+        }
+
+        let cvData = {
+            personal: {
+                name: "Sarah Wijaya",
+                title: "Graphic Designer",
+                about: "Profesional Graphic Designer dengan pengalaman 5+ tahun. Berfokus pada perancangan visual identitas merek, desain UI/UX, dan ilustrasi digital kreatif untuk meningkatkan daya tarik produk.",
+                email: "sarah.wijaya@email.com",
+                phone: "+62 812 3456 7890",
+                address: "Jakarta Selatan, Indonesia",
+                web: "linkedin.com/in/sarahwijaya",
+                photo: "" // base64
+            },
+            experience: [
+                { id: 'e1', title: "Senior UI/UX Designer", company: "Tech Startup XYZ", date: "Jan 2022 - Sekarang", desc: "Memimpin perancangan antarmuka pengguna untuk aplikasi mobile dan web. Meningkatkan user retention sebesar 45% dalam 6 bulan pertama." },
+                { id: 'e2', title: "Graphic Design Intern", company: "Agency Kreatif ABC", date: "Jun 2020 - Des 2021", desc: "Mendesain materi promosi digital dan cetak untuk berbagai kampanye media sosial klien besar." }
+            ],
+            education: [
+                { id: 'edu1', degree: "S1 Desain Komunikasi Visual", school: "Institut Kesenian Jakarta", date: "2016 - 2020", desc: "IPK 3.85. Lulus dengan predikat Cumlaude." }
+            ],
+            skills: ["UI/UX Design", "Adobe Creative Suite", "Figma", "Ilustrasi Digital", "Branding"],
+            languages: ["Indonesia (Native)", "Inggris (Professional)"],
+            settings: {
+                template: "wave1", // Default template Wavy 1
+                color: "#008080", // Warna default Teal persis di gambar
+                font: "font-sans",
+                photoShape: "rounded-full"
+            }
+        };
+
+        const TEMPLATES = ['wave1', 'wave2', 'wave3', 'minimalist', 'creative', 'dark', 'corporate', 'tech', 'executive', 'split', 'developer', 'academic', 'startup'];
+
+        // DOM Elements
+        const appContainer = document.getElementById('app-container');
+        const landingPage = document.getElementById('landing-page');
+        const navCta = document.getElementById('nav-cta');
+        const cvPreview = document.getElementById('cv-preview');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        
+        // Navigation Functions
+        function startApp() {
+            landingPage.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            navCta.classList.add('hidden');
+            window.scrollTo(0,0);
+            
+            // Force template back to minimalist if not premium
+            if (!isPremium && TEMPLATES.indexOf(cvData.settings.template) < 3) {
+                 // Izinkan melihat preview saat free jika dipaksa by default, tapi kita set default ke minimalist saja untuk free
+                 if(cvData.settings.template !== 'minimalist') {
+                     cvData.settings.template = 'minimalist';
+                     cvData.settings.color = '#3b82f6';
+                 }
+            }
+
+            adjustCVScale();
+            updateUIPermissions();
+            renderCV();
+            populateForm();
+        }
+
+        function showLanding() {
+            landingPage.classList.remove('hidden');
+            appContainer.classList.add('hidden');
+            navCta.classList.remove('hidden');
+        }
+
+        function showUpsell() {
+            document.getElementById('upsell-modal').classList.remove('hidden');
+            document.getElementById('upsell-modal').classList.add('flex');
+            document.getElementById('error-msg').classList.add('hidden');
+            document.getElementById('premium-code').value = '';
+        }
+
+        function closeUpsell() {
+            document.getElementById('upsell-modal').classList.add('hidden');
+            document.getElementById('upsell-modal').classList.remove('flex');
+        }
+
+        // FUNGSI KONTAK WA ADMIN
+        function contactAdmin() {
+            const message = "Halo Admin CV Builder,\n\nSaya ingin meng-upgrade akun saya ke paket *Premium (Rp 10.000)*.\nMohon info nomor rekening / QRIS untuk pembayaran.\n\nTerima kasih.";
+            const waUrl = `https://wa.me/${ADMIN_WA_NUMBER}?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
+        }
+
+        // FUNGSI VERIFIKASI KODE VOUCHER
+        function verifyCode() {
+            const inputEl = document.getElementById('premium-code');
+            const errorMsg = document.getElementById('error-msg');
+            const userInput = inputEl.value.trim().toUpperCase();
+
+            if (userInput === SECRET_PREMIUM_CODE) {
+                isPremium = true;
+                localStorage.setItem('cvPremiumStatus', 'true'); 
+                
+                closeUpsell();
+                updateUIPermissions();
+                renderCV();
+                
+                setTimeout(() => {
+                    alert('🎉 AKTIVASI BERHASIL!\n\nTerima kasih, semua fitur Premium (13 Template VIP Wavy, Warna Custom, Tanpa Watermark) kini telah terbuka untuk Anda.');
+                }, 300);
+            } else {
+                errorMsg.classList.remove('hidden');
+                inputEl.classList.add('border-red-500', 'ring-red-500');
+                
+                inputEl.classList.add('translate-x-1');
+                setTimeout(() => inputEl.classList.remove('translate-x-1'), 100);
+                setTimeout(() => inputEl.classList.add('-translate-x-1'), 200);
+                setTimeout(() => inputEl.classList.remove('-translate-x-1'), 300);
+            }
+        }
+
+        function updateUIPermissions() {
+            const lockIcons = document.querySelectorAll('.lock-icon');
+            if (isPremium) {
+                lockIcons.forEach(icon => icon.classList.add('hidden'));
+            } else {
+                lockIcons.forEach(icon => icon.classList.remove('hidden'));
+            }
+            updateTemplateButtons();
+        }
+
+        // Dark Mode Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            renderCV();
+        });
+
+        // Form Binding & Updates
+        function updateData(section, field, value) {
+            cvData[section][field] = value;
+            saveLocal();
+            renderCV();
+            calculateProgress();
+        }
+
+        function updateListStr(field, value) {
+            cvData[field] = value.split(',').map(s => s.trim()).filter(s => s !== "");
+            saveLocal();
+            renderCV();
+            calculateProgress();
+        }
+
+        function updateArrayItem(section, id, field, value) {
+            const index = cvData[section].findIndex(item => item.id === id);
+            if (index !== -1) {
+                cvData[section][index][field] = value;
+                saveLocal();
+                renderCV();
+            }
+        }
+
+        function addListItem(section) {
+            const newItem = section === 'experience' ? 
+                { id: 'exp' + Date.now(), title: "", company: "", date: "", desc: "" } :
+                { id: 'edu' + Date.now(), degree: "", school: "", date: "", desc: "" };
+            
+            cvData[section].push(newItem);
+            renderListInputs(section);
+            renderCV();
+            
+            setTimeout(() => {
+                document.getElementById('form-scroll').scrollTop = document.getElementById('form-scroll').scrollHeight;
+            }, 100);
+        }
+
+        function removeListItem(section, id) {
+            cvData[section] = cvData[section].filter(item => item.id !== id);
+            renderListInputs(section);
+            renderCV();
+        }
+
+        function renderListInputs(section) {
+            const container = document.getElementById(`${section}-list`);
+            container.innerHTML = '';
+            
+            cvData[section].forEach((item, index) => {
+                const el = document.createElement('div');
+                el.className = 'p-4 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-800/50 mb-3 relative group';
+                
+                const isExp = section === 'experience';
+                
+                el.innerHTML = `
+                    <button onclick="removeListItem('${section}', '${item.id}')" class="absolute top-2 right-2 p-1 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                    <div class="space-y-3 mt-2">
+                        <div class="input-group mb-0">
+                            <input type="text" placeholder=" " value="${isExp ? item.title : item.degree}" oninput="updateArrayItem('${section}', '${item.id}', '${isExp ? 'title' : 'degree'}', this.value)">
+                            <label>${isExp ? 'Posisi / Gelar' : 'Gelar / Jurusan'}</label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="input-group mb-0">
+                                <input type="text" placeholder=" " value="${isExp ? item.company : item.school}" oninput="updateArrayItem('${section}', '${item.id}', '${isExp ? 'company' : 'school'}', this.value)">
+                                <label>${isExp ? 'Perusahaan' : 'Institusi'}</label>
+                            </div>
+                            <div class="input-group mb-0">
+                                <input type="text" placeholder=" " value="${item.date}" oninput="updateArrayItem('${section}', '${item.id}', 'date', this.value)">
+                                <label>Tahun (Mis: 2020 - 2022)</label>
+                            </div>
+                        </div>
+                        <div class="input-group mb-0">
+                            <textarea rows="2" placeholder=" " oninput="updateArrayItem('${section}', '${item.id}', 'desc', this.value)">${item.desc}</textarea>
+                            <label>Deskripsi (Opsional)</label>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+            lucide.createIcons();
+        }
+
+        function populateForm() {
+            document.getElementById('cv-name').value = cvData.personal.name;
+            document.getElementById('cv-title').value = cvData.personal.title;
+            document.getElementById('cv-about').value = cvData.personal.about;
+            document.getElementById('cv-email').value = cvData.personal.email;
+            document.getElementById('cv-phone').value = cvData.personal.phone;
+            document.getElementById('cv-address').value = cvData.personal.address;
+            document.getElementById('cv-web').value = cvData.personal.web;
+            document.getElementById('cv-skills').value = cvData.skills.join(', ');
+            document.getElementById('cv-languages').value = cvData.languages.join(', ');
+            
+            renderListInputs('experience');
+            renderListInputs('education');
+            calculateProgress();
+            updateTemplateButtons();
+        }
+
+        const dropZone = document.getElementById('photo-dropzone');
+        const fileInput = document.getElementById('photo-upload');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', function() {
+            if (this.files.length) handleFile(this.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Pilih file gambar!'); return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                cvData.personal.photo = e.target.result;
+                dropZone.innerHTML = `<img src="${e.target.result}" class="w-16 h-16 object-cover rounded-xl mb-2"><span class="text-xs text-blue-600 font-medium">Ganti Foto</span>`;
+                saveLocal();
+                renderCV();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function calculateProgress() {
+            let totalFields = 8;
+            let filledFields = 0;
+            
+            if(cvData.personal.name) filledFields++;
+            if(cvData.personal.title) filledFields++;
+            if(cvData.personal.email) filledFields++;
+            if(cvData.personal.phone) filledFields++;
+            if(cvData.personal.about) filledFields++;
+            if(cvData.experience.length > 0 && cvData.experience[0].title) filledFields++;
+            if(cvData.education.length > 0 && cvData.education[0].school) filledFields++;
+            if(cvData.skills.length > 0) filledFields++;
+
+            const percentage = Math.round((filledFields / totalFields) * 100);
+            progressBar.style.width = `${percentage}%`;
+            progressText.innerText = `${percentage}%`;
+            
+            if (percentage === 100) {
+                progressBar.classList.remove('bg-blue-600');
+                progressBar.classList.add('bg-green-500');
+                progressText.classList.remove('text-blue-600');
+                progressText.classList.add('text-green-500');
+            } else {
+                progressBar.classList.add('bg-blue-600');
+                progressBar.classList.remove('bg-green-500');
+                progressText.classList.add('text-blue-600');
+                progressText.classList.remove('text-green-500');
+            }
+        }
+
+        function changeTemplate(type) {
+            if (type !== 'minimalist' && !isPremium) {
+                showUpsell();
+                return;
+            }
+            cvData.settings.template = type;
+            saveLocal();
+            updateTemplateButtons();
+            renderCV();
+        }
+
+        function changeColor(color) {
+            if (color !== '#008080' && color !== '#3b82f6' && !isPremium) {
+                showUpsell();
+                return;
+            }
+            cvData.settings.color = color;
+            saveLocal();
+            renderCV();
+        }
+
+        function updateTemplateButtons() {
+            TEMPLATES.forEach(t => {
+                const btn = document.getElementById(`btn-tpl-${t}`);
+                if (!btn) return;
+                if (t === cvData.settings.template) {
+                    btn.classList.add('bg-white', 'dark:bg-slate-700', 'shadow-sm', 'text-slate-900', 'dark:text-white');
+                    btn.classList.remove('text-slate-500', 'hover:text-slate-800');
+                } else {
+                    btn.classList.remove('bg-white', 'dark:bg-slate-700', 'shadow-sm', 'text-slate-900', 'dark:text-white');
+                    btn.classList.add('text-slate-500', 'hover:text-slate-800');
+                }
+            });
+        }
+
+        function adjustCVScale() {
+            const wrapper = document.getElementById('cv-wrapper-scroll');
+            const scaleWrapper = document.querySelector('.scale-wrapper');
+            
+            // Mencegah error jika elemen belum dirender
+            if (!wrapper || !scaleWrapper) return; 
+            
+            const cw = wrapper.clientWidth;
+            // Mencegah proses jika clientWidth 0 (misal sedang di-hide/display none)
+            if (cw === 0) return; 
+            
+            const a4WidthPixel = 794; // approx 210mm in pixels at 96dpi
+            const padding = window.innerWidth < 768 ? 20 : 60;
+            
+            if (cw < (a4WidthPixel + padding)) {
+                const scale = (cw - padding) / a4WidthPixel;
+                scaleWrapper.style.transform = `scale(${scale})`;
+                // Maintain height of wrapper based on scaled A4 height (1123px)
+                wrapper.style.height = `${(1123 * scale) + padding}px`;
+            } else {
+                scaleWrapper.style.transform = `scale(1)`;
+                wrapper.style.height = 'auto';
+            }
+        }
+
+        window.addEventListener('resize', adjustCVScale);
+
+        // ================= PREMIUM TEMPLATES RENDERING =================
+        function renderCV() {
+            const tpl = cvData.settings.template;
+            const themeColor = cvData.settings.color;
+            let htmlContent = '';
+            const { personal, experience, education, skills, languages } = cvData;
+            
+            // Watermark hanya tampil jika bukan premium
+            const watermark = `<div class="absolute bottom-3 left-0 right-0 text-center text-[10px] font-bold text-slate-400 opacity-60 watermark-text font-sans z-50">Dibuat dengan CV Builder Premium - Studio Jasa Digital</div>`;
+
+            // Helper to handle empty lists smoothly
+            const safeExp = experience.length > 0 && experience[0].title ? experience : [];
+            const safeEdu = education.length > 0 && education[0].school ? education : [];
+
+            // ================= 3 TEMA BARU DARI GAMBAR =================
+
+            // 1. WAVE 1 (Kiri - Teal & Biru Gelap)
+            if (tpl === 'wave1') {
+                htmlContent = `
+                    <div class="h-full w-full flex flex-col ${cvData.settings.font} bg-white relative overflow-hidden z-0">
+                        <!-- Wavy Header -->
+                        <div class="h-[240px] w-full relative shrink-0">
+                            <!-- SVG Waves -->
+                            <svg viewBox="0 0 1440 320" class="absolute top-0 left-0 w-full h-full object-cover z-0" preserveAspectRatio="none">
+                                <path fill="${themeColor}" d="M0,160L48,170.7C96,181,192,203,288,197.3C384,192,480,160,576,160C672,160,768,192,864,197.3C960,203,1056,181,1152,160C1248,139,1344,117,1392,106.7L1440,96L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+                                <path fill="#0f172a" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+                            </svg>
+                            <div class="relative z-10 flex items-center h-full px-12 gap-8">
+                                ${personal.photo ? `<img src="${personal.photo}" class="w-40 h-40 object-cover rounded-full border-4 border-white shadow-xl">` : `<div class="w-40 h-40 rounded-full border-4 border-white shadow-xl bg-slate-200"></div>`}
+                                <div class="text-white mt-4">
+                                    <h1 class="text-5xl font-black uppercase tracking-wide drop-shadow-md">${personal.name || 'NAMA LENGKAP'}</h1>
+                                    <h2 class="text-xl font-bold mt-2 tracking-widest text-slate-200 uppercase">${personal.title || 'Posisi / Profesi'}</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2 Column Body -->
+                        <div class="flex flex-1">
+                            <!-- Left Col (Dark Blue) -->
+                            <div class="w-[35%] bg-[#0f172a] text-white p-8 pt-4 flex flex-col relative">
+                                <!-- Rect untuk menutupi celah di bawah kurva SVG -->
+                                <div class="absolute top-[-5px] left-0 w-full h-10 bg-[#0f172a]"></div>
+                                <div class="relative z-10">
+                                    <!-- Contact -->
+                                    <div class="mb-10 mt-2">
+                                        <h3 class="text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2 pb-2"><i data-lucide="user" class="w-5 h-5" style="color:${themeColor}"></i> PROFILE</h3>
+                                        <div class="space-y-4 text-xs font-medium text-slate-300 ml-1">
+                                            ${personal.phone ? `<div class="flex items-center gap-3"><i data-lucide="phone" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.phone}</div>` : ''}
+                                            ${personal.email ? `<div class="flex items-center gap-3 break-all"><i data-lucide="mail" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.email}</div>` : ''}
+                                            ${personal.address ? `<div class="flex items-center gap-3"><i data-lucide="map-pin" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.address}</div>` : ''}
+                                            ${personal.web ? `<div class="flex items-center gap-3 break-all"><i data-lucide="globe" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.web}</div>` : ''}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Skills -->
+                                    ${skills.length > 0 ? `
+                                    <div class="mb-10">
+                                        <h3 class="text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2 pb-2"><i data-lucide="award" class="w-5 h-5" style="color:${themeColor}"></i> SKILLS</h3>
+                                        <div class="space-y-4 ml-1">
+                                            ${skills.map(s => `
+                                                <div>
+                                                    <div class="text-xs font-bold mb-1">${s}</div>
+                                                    <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                                        <div class="h-full rounded-full" style="width: ${Math.floor(Math.random() * 40 + 60)}%; background:${themeColor}"></div>
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>` : ''}
+
+                                    <!-- Languages -->
+                                    ${languages.length > 0 ? `
+                                    <div>
+                                        <h3 class="text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2 pb-2"><i data-lucide="message-circle" class="w-5 h-5" style="color:${themeColor}"></i> LANGUAGES</h3>
+                                        <div class="space-y-3 ml-1">
+                                            ${languages.map(l => `
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-2 h-2 rounded-full" style="background:${themeColor}"></div>
+                                                    <span class="text-xs font-bold text-slate-300">${l}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>` : ''}
+                                </div>
+                            </div>
+
+                            <!-- Right Col (White) -->
+                            <div class="w-[65%] bg-white p-8 pt-6">
+                                ${personal.about ? `
+                                <div class="mb-10">
+                                    <h3 class="text-lg font-black uppercase tracking-widest mb-4 flex items-center gap-2 text-slate-900"><i data-lucide="info" class="w-6 h-6" style="color:${themeColor}"></i> PROFILE</h3>
+                                    <p class="text-sm text-slate-600 leading-relaxed font-medium text-justify">${personal.about}</p>
+                                </div>` : ''}
+
+                                ${safeEdu.length > 0 ? `
+                                <div class="mb-10">
+                                    <h3 class="text-lg font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-slate-900"><i data-lucide="graduation-cap" class="w-6 h-6" style="color:${themeColor}"></i> EDUCATION</h3>
+                                    <div class="space-y-6">
+                                        ${safeEdu.map(e => `
+                                            <div class="relative pl-6">
+                                                <div class="absolute left-0 top-1.5 w-2 h-2 rounded-full" style="background:${themeColor}"></div>
+                                                <h4 class="font-bold text-slate-900 text-base">${e.degree}</h4>
+                                                <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-2">
+                                                    <span>${e.school}</span>
+                                                    <span style="color:${themeColor}">${e.date}</span>
+                                                </div>
+                                                <p class="text-sm text-slate-600 leading-relaxed">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+
+                                ${safeExp.length > 0 ? `
+                                <div>
+                                    <h3 class="text-lg font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-slate-900"><i data-lucide="briefcase" class="w-6 h-6" style="color:${themeColor}"></i> EXPERIENCE</h3>
+                                    <div class="space-y-6">
+                                        ${safeExp.map(e => `
+                                            <div class="relative pl-6">
+                                                <div class="absolute left-0 top-1.5 w-2 h-2 rounded-full" style="background:${themeColor}"></div>
+                                                <h4 class="font-bold text-slate-900 text-base">${e.title}</h4>
+                                                <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-2">
+                                                    <span style="color:${themeColor}">${e.company}</span>
+                                                    <span>${e.date}</span>
+                                                </div>
+                                                <p class="text-sm text-slate-600 leading-relaxed">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+
+            // 2. WAVE 2 (Tengah - Dark & Orange)
+            else if (tpl === 'wave2') {
+                htmlContent = `
+                    <div class="h-full w-full flex flex-col ${cvData.settings.font} bg-white relative z-0">
+                        <div class="h-[230px] w-full bg-[#0f172a] relative shrink-0">
+                            <!-- Orange/Theme Color SVG Wave separator -->
+                            <svg viewBox="0 0 1440 120" class="absolute bottom-[-119px] left-0 w-full h-[120px] z-10" preserveAspectRatio="none">
+                                <path fill="${themeColor}" d="M0,32L60,42.7C120,53,240,75,360,74.7C480,75,600,53,720,42.7C840,32,960,32,1080,42.7C1200,53,1320,75,1380,85.3L1440,96L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path>
+                                <path fill="#0f172a" d="M0,64L60,69.3C120,75,240,85,360,80C480,75,600,53,720,48C840,43,960,53,1080,64C1200,75,1320,85,1380,90.7L1440,96L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path>
+                            </svg>
+                            <!-- Content -->
+                            <div class="flex items-center justify-center h-full px-12 gap-10 relative z-20">
+                                 ${personal.photo ? `<img src="${personal.photo}" class="w-40 h-40 object-cover rounded-full border-4 border-slate-700 shadow-2xl">` : `<div class="w-40 h-40 rounded-full border-4 border-slate-700 shadow-2xl bg-slate-800"></div>`}
+                                 <div class="text-white">
+                                    <h1 class="text-[3rem] leading-none font-black uppercase tracking-tight">${personal.name || 'NAMA LENGKAP'}</h1>
+                                    <h2 class="text-xl font-bold mt-3 uppercase tracking-[0.2em]" style="color: ${themeColor}">${personal.title || 'Posisi / Profesi'}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-1 pt-[120px]">
+                             <!-- Left Col (Dark Blue) -->
+                             <div class="w-[35%] bg-[#0f172a] text-white p-8 pt-0 flex flex-col relative -mt-[120px] z-0">
+                                  <!-- Spacer to push content below wave -->
+                                  <div class="h-[140px]"></div>
+                                  
+                                  <div class="mb-10">
+                                        <h3 class="text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="user" class="w-5 h-5 text-white"></i> PROFILE</h3>
+                                        <div class="space-y-4 text-xs font-medium text-slate-300 ml-1">
+                                            ${personal.phone ? `<div class="flex items-center gap-3"><i data-lucide="phone" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.phone}</div>` : ''}
+                                            ${personal.email ? `<div class="flex items-center gap-3 break-all"><i data-lucide="mail" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.email}</div>` : ''}
+                                            ${personal.address ? `<div class="flex items-center gap-3"><i data-lucide="map-pin" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.address}</div>` : ''}
+                                            ${personal.web ? `<div class="flex items-center gap-3 break-all"><i data-lucide="globe" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.web}</div>` : ''}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Skills -->
+                                    ${skills.length > 0 ? `
+                                    <div class="mb-10">
+                                        <h3 class="text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="award" class="w-5 h-5 text-white"></i> SKILLS</h3>
+                                        <div class="space-y-4 ml-1">
+                                            ${skills.map(s => `
+                                                <div>
+                                                    <div class="text-xs font-bold mb-1">${s}</div>
+                                                    <div class="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                                                        <div class="h-full rounded-full" style="width: ${Math.floor(Math.random() * 40 + 60)}%; background:${themeColor}"></div>
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>` : ''}
+
+                                    <!-- Languages -->
+                                    ${languages.length > 0 ? `
+                                    <div>
+                                        <h3 class="text-sm font-bold uppercase tracking-widest mb-6 flex items-center gap-2"><i data-lucide="message-circle" class="w-5 h-5 text-white"></i> LANGUAGES</h3>
+                                        <div class="space-y-3 ml-1">
+                                            ${languages.map(l => `
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-2 h-2 rounded-full" style="background:${themeColor}"></div>
+                                                    <span class="text-xs font-bold text-slate-300">${l}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>` : ''}
+                             </div>
+
+                             <!-- Right Col (White) -->
+                             <div class="w-[65%] p-8 pt-0">
+                                 ${personal.about ? `
+                                <div class="mb-10">
+                                    <h3 class="text-lg font-black uppercase tracking-widest mb-4 flex items-center gap-2 text-slate-800"><i data-lucide="info" class="w-6 h-6" style="color:${themeColor}"></i> PROFILE</h3>
+                                    <p class="text-sm text-slate-600 leading-relaxed font-medium text-justify">${personal.about}</p>
+                                </div>` : ''}
+
+                                ${safeEdu.length > 0 ? `
+                                <div class="mb-10">
+                                    <h3 class="text-lg font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-slate-800"><i data-lucide="graduation-cap" class="w-6 h-6" style="color:${themeColor}"></i> EDUCATION</h3>
+                                    <div class="space-y-6">
+                                        ${safeEdu.map(e => `
+                                            <div class="relative pl-6">
+                                                <div class="absolute left-0 top-1.5 w-2 h-2 rounded-full" style="background:${themeColor}"></div>
+                                                <h4 class="font-bold text-slate-900 text-base">${e.degree}</h4>
+                                                <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-2 mt-1">
+                                                    <span class="uppercase tracking-wide">${e.school}</span>
+                                                    <span class="text-slate-500">${e.date}</span>
+                                                </div>
+                                                <p class="text-sm text-slate-600 leading-relaxed">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+
+                                ${safeExp.length > 0 ? `
+                                <div>
+                                    <h3 class="text-lg font-black uppercase tracking-widest mb-6 flex items-center gap-2 text-slate-800"><i data-lucide="briefcase" class="w-6 h-6" style="color:${themeColor}"></i> EXPERIENCE</h3>
+                                    <div class="space-y-6">
+                                        ${safeExp.map(e => `
+                                            <div class="relative pl-6">
+                                                <div class="absolute left-0 top-1.5 w-2 h-2 rounded-full" style="background:${themeColor}"></div>
+                                                <h4 class="font-bold text-slate-900 text-base">${e.title}</h4>
+                                                <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-2 mt-1">
+                                                    <span class="uppercase tracking-wide" style="color:${themeColor}">${e.company}</span>
+                                                    <span class="text-slate-500">${e.date}</span>
+                                                </div>
+                                                <p class="text-sm text-slate-600 leading-relaxed">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                             </div>
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+
+            // 3. WAVE 3 (Kanan - Pink Elegant)
+            else if (tpl === 'wave3') {
+                htmlContent = `
+                    <div class="h-full w-full flex flex-col ${cvData.settings.font} bg-white relative z-0">
+                        <div class="h-[220px] w-full relative shrink-0">
+                            <!-- Pink Wavy SVG Background -->
+                            <svg viewBox="0 0 1440 250" class="absolute top-0 left-0 w-full h-[250px] object-cover z-0" preserveAspectRatio="none">
+                                <path fill="${themeColor}30" d="M0,128L48,138.7C96,149,192,171,288,160C384,149,480,107,576,101.3C672,96,768,128,864,144C960,160,1056,160,1152,144C1248,128,1344,96,1392,80L1440,64L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+                                <path fill="${themeColor}15" d="M0,64L48,80C96,96,192,128,288,122.7C384,117,480,75,576,69.3C672,64,768,96,864,112C960,128,1056,128,1152,112C1248,96,1344,64,1392,48L1440,32L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+                            </svg>
+                            <div class="relative z-10 flex items-center justify-center h-full px-12 gap-10">
+                                ${personal.photo ? `<img src="${personal.photo}" class="w-40 h-40 object-cover rounded-full border-4 border-white shadow-xl">` : `<div class="w-40 h-40 rounded-full border-4 border-white shadow-xl bg-slate-100"></div>`}
+                                <div class="mt-4">
+                                    <h1 class="text-5xl font-black uppercase tracking-wide" style="color:${themeColor}">${personal.name || 'NAMA LENGKAP'}</h1>
+                                    <h2 class="text-xl font-black mt-2 tracking-widest uppercase" style="color:${themeColor}90">${personal.title || 'Posisi / Profesi'}</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-1 mt-6">
+                            <!-- Left Col (Light Pinkish) -->
+                            <div class="w-[35%] p-8 pt-6 flex flex-col relative" style="background-color:${themeColor}0A">
+                                <div class="mb-10">
+                                    <h3 class="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color:${themeColor}"><i data-lucide="user" class="w-5 h-5"></i> PROFILE</h3>
+                                    <div class="space-y-4 text-xs font-bold text-slate-600 ml-1">
+                                        ${personal.phone ? `<div class="flex items-center gap-3"><div class="p-1.5 rounded-full text-white shadow-sm" style="background:${themeColor}"><i data-lucide="phone" class="w-3 h-3"></i></div> ${personal.phone}</div>` : ''}
+                                        ${personal.email ? `<div class="flex items-center gap-3 break-all"><div class="p-1.5 rounded-full text-white shadow-sm" style="background:${themeColor}"><i data-lucide="mail" class="w-3 h-3"></i></div> ${personal.email}</div>` : ''}
+                                        ${personal.address ? `<div class="flex items-center gap-3"><div class="p-1.5 rounded-full text-white shadow-sm" style="background:${themeColor}"><i data-lucide="map-pin" class="w-3 h-3"></i></div> ${personal.address}</div>` : ''}
+                                        ${personal.web ? `<div class="flex items-center gap-3 break-all"><div class="p-1.5 rounded-full text-white shadow-sm" style="background:${themeColor}"><i data-lucide="globe" class="w-3 h-3"></i></div> ${personal.web}</div>` : ''}
+                                    </div>
+                                </div>
+
+                                ${skills.length > 0 ? `
+                                <div class="mb-10">
+                                    <h3 class="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color:${themeColor}"><i data-lucide="award" class="w-5 h-5"></i> SKILLS</h3>
+                                    <div class="space-y-4 ml-1">
+                                        ${skills.map(s => `
+                                            <div>
+                                                <div class="text-xs font-bold mb-1 text-slate-700">${s}</div>
+                                                <div class="w-full h-2 bg-white rounded-full overflow-hidden shadow-inner">
+                                                    <div class="h-full rounded-full" style="width: ${Math.floor(Math.random() * 30 + 70)}%; background:${themeColor}"></div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                                
+                                ${languages.length > 0 ? `
+                                <div>
+                                    <h3 class="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color:${themeColor}"><i data-lucide="globe" class="w-5 h-5"></i> LANGUAGES</h3>
+                                    <div class="space-y-3 ml-1">
+                                        ${languages.map(l => `
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-2 h-2 rounded-full" style="background:${themeColor}"></div>
+                                                <span class="text-xs font-bold text-slate-600">${l}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+
+                            <!-- Right Col (White) -->
+                            <div class="w-[65%] bg-white p-8 pt-6">
+                                ${personal.about ? `
+                                <div class="mb-10">
+                                    <h3 class="text-lg font-black uppercase tracking-widest mb-4 flex items-center gap-2" style="color:${themeColor}"><i data-lucide="info" class="w-6 h-6"></i> PROFILE</h3>
+                                    <p class="text-sm text-slate-600 leading-relaxed font-medium text-justify">${personal.about}</p>
+                                </div>` : ''}
+
+                                ${safeEdu.length > 0 ? `
+                                <div class="mb-10">
+                                    <h3 class="text-lg font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color:${themeColor}"><i data-lucide="graduation-cap" class="w-6 h-6"></i> EDUCATION</h3>
+                                    <div class="space-y-6">
+                                        ${safeEdu.map(e => `
+                                            <div class="relative pl-8">
+                                                <div class="absolute left-0 top-1 w-5 h-5 rounded-full flex items-center justify-center" style="background:${themeColor}20">
+                                                    <div class="w-2 h-2 rounded-full" style="background:${themeColor}"></div>
+                                                </div>
+                                                <h4 class="font-bold text-slate-900 text-base">${e.degree}</h4>
+                                                <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-2">
+                                                    <span class="uppercase tracking-wider">${e.school}</span>
+                                                    <span style="color:${themeColor}">${e.date}</span>
+                                                </div>
+                                                <p class="text-sm text-slate-600 leading-relaxed">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+
+                                ${safeExp.length > 0 ? `
+                                <div>
+                                    <h3 class="text-lg font-black uppercase tracking-widest mb-6 flex items-center gap-2" style="color:${themeColor}"><i data-lucide="briefcase" class="w-6 h-6"></i> EXPERIENCE</h3>
+                                    <div class="space-y-6">
+                                        ${safeExp.map(e => `
+                                            <div class="relative pl-8">
+                                                <div class="absolute left-0 top-1 w-5 h-5 rounded-full flex items-center justify-center" style="background:${themeColor}20">
+                                                    <div class="w-2 h-2 rounded-full" style="background:${themeColor}"></div>
+                                                </div>
+                                                <h4 class="font-bold text-slate-900 text-base">${e.title}</h4>
+                                                <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-2">
+                                                    <span class="uppercase tracking-wider" style="color:${themeColor}">${e.company}</span>
+                                                    <span>${e.date}</span>
+                                                </div>
+                                                <p class="text-sm text-slate-600 leading-relaxed">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+
+            // ================= TEMPLATE LAMA LAINNYA =================
+
+            // 4. MINIMALIST
+            else if (tpl === 'minimalist') {
+                htmlContent = `
+                    <div class="h-full w-full flex ${cvData.settings.font} bg-paper relative p-3">
+                        <div class="absolute inset-3 border border-slate-200 pointer-events-none z-10 rounded-sm shadow-[inset_0_0_15px_rgba(0,0,0,0.02)]"></div>
+                        <div class="absolute top-0 left-0 w-full h-2" style="background:${themeColor}"></div>
+                        <div class="w-1/3 bg-slate-50/90 p-8 border-r border-slate-200 flex flex-col z-20 mt-2">
+                            ${personal.photo ? `<img src="${personal.photo}" class="w-40 h-40 object-cover rounded-full mx-auto mb-6 border-4 border-white shadow-md cv-photo">` : ''}
+                            <div class="mb-8 mt-4">
+                                <h4 class="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b-2" style="border-color: ${themeColor}">Kontak</h4>
+                                <div class="space-y-3 text-xs text-slate-700">
+                                    ${personal.email ? `<div class="flex items-center gap-2 break-all"><i data-lucide="mail" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.email}</div>` : ''}
+                                    ${personal.phone ? `<div class="flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.phone}</div>` : ''}
+                                    ${personal.address ? `<div class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.address}</div>` : ''}
+                                    ${personal.web ? `<div class="flex items-center gap-2 break-all"><i data-lucide="globe" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.web}</div>` : ''}
+                                </div>
+                            </div>
+                            ${skills.length > 0 ? `<div class="mb-8"><h4 class="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b-2" style="border-color: ${themeColor}">Keahlian</h4><ul class="text-xs text-slate-700 space-y-1.5 list-disc list-inside">${skills.map(s => `<li>${s}</li>`).join('')}</ul></div>` : ''}
+                            ${languages.length > 0 ? `<div class="mb-8"><h4 class="text-sm font-bold uppercase tracking-wider mb-3 pb-1 border-b-2" style="border-color: ${themeColor}">Bahasa</h4><ul class="text-xs text-slate-700 space-y-1.5 list-disc list-inside">${languages.map(l => `<li>${l}</li>`).join('')}</ul></div>` : ''}
+                        </div>
+                        <div class="w-2/3 p-10 flex flex-col z-20 bg-transparent mt-2">
+                            <div class="mb-10">
+                                <h1 class="text-[2.5rem] font-black text-slate-900 mb-2 uppercase tracking-tight leading-none">${personal.name || 'NAMA LENGKAP'}</h1>
+                                <h2 class="text-lg font-semibold tracking-widest uppercase mt-2" style="color: ${themeColor}">${personal.title || 'Posisi / Profesi'}</h2>
+                            </div>
+                            ${personal.about ? `<div class="mb-10"><p class="text-sm text-slate-600 leading-relaxed text-justify relative"><span class="absolute -left-4 top-0 text-3xl opacity-20" style="color:${themeColor}">"</span>${personal.about}</p></div>` : ''}
+                            ${safeExp.length > 0 ? `<div class="mb-10"><h3 class="text-lg font-bold uppercase tracking-wider mb-5 pb-2 border-b-2" style="border-color: ${themeColor}40; color: #0f172a;">Pengalaman Kerja</h3><div class="space-y-6">${safeExp.map(e => `<div><div class="flex justify-between items-baseline mb-1"><h4 class="font-bold text-slate-800 text-base">${e.title}</h4><span class="text-xs font-bold" style="color:${themeColor}">${e.date}</span></div><div class="text-sm font-medium text-slate-500 mb-2">${e.company}</div><p class="text-xs text-slate-600 leading-relaxed">${e.desc}</p></div>`).join('')}</div></div>` : ''}
+                            ${safeEdu.length > 0 ? `<div class="mb-8"><h3 class="text-lg font-bold uppercase tracking-wider mb-5 pb-2 border-b-2" style="border-color: ${themeColor}40; color: #0f172a;">Pendidikan</h3><div class="space-y-5">${safeEdu.map(e => `<div><div class="flex justify-between items-baseline mb-1"><h4 class="font-bold text-slate-800">${e.degree}</h4><span class="text-xs font-bold" style="color:${themeColor}">${e.date}</span></div><div class="text-sm font-medium text-slate-500 mb-1">${e.school}</div><p class="text-xs text-slate-600">${e.desc}</p></div>`).join('')}</div></div>` : ''}
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            } 
+            // 5. CREATIVE
+            else if (tpl === 'creative') {
+                htmlContent = `
+                    <div class="h-full w-full flex flex-col ${cvData.settings.font} bg-paper relative overflow-hidden">
+                        <div class="absolute top-[-100px] left-[-100px] w-96 h-96 rounded-full mix-blend-multiply opacity-20 filter blur-3xl" style="background:${themeColor}"></div>
+                        <div class="absolute bottom-[-100px] right-[-100px] w-[500px] h-[500px] rounded-full mix-blend-multiply opacity-10 filter blur-3xl" style="background:${themeColor}"></div>
+                        
+                        <div class="h-56 text-white p-12 flex items-center justify-between relative z-10 shadow-lg" style="background: linear-gradient(135deg, ${themeColor}, #1e293b);">
+                            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPPHBhdGggZD0iTTAgMzlsaDQwIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjxwYXRoIGQ9Ik0zOSAwTDM5IDQwIiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC4xKSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNhKSIvPjwvc3ZnPg==')] opacity-30"></div>
+                            <div class="w-2/3 relative z-10">
+                                <h1 class="text-5xl font-black mb-2 uppercase tracking-tight drop-shadow-md">${personal.name || 'NAMA LENGKAP'}</h1>
+                                <h2 class="text-xl font-medium opacity-90 tracking-widest">${personal.title || 'Posisi / Profesi'}</h2>
+                            </div>
+                            <div class="w-1/3 flex justify-end relative z-10">
+                                ${personal.photo ? `<img src="${personal.photo}" class="w-36 h-36 object-cover rounded-2xl shadow-2xl absolute -bottom-28 right-0 border-4 border-white cv-photo transform rotate-3">` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-1 p-12 pt-16 relative z-10">
+                            <div class="w-[65%] pr-12">
+                                ${personal.about ? `<div class="mb-10"><h3 class="text-xl font-bold uppercase mb-4 flex items-center gap-3" style="color:${themeColor}"><i data-lucide="user-circle" class="w-6 h-6"></i> Profil</h3><p class="text-sm text-slate-600 leading-relaxed font-medium bg-white p-5 rounded-xl shadow-sm border border-slate-100">${personal.about}</p></div>` : ''}
+                                ${safeExp.length > 0 ? `<div class="mb-10"><h3 class="text-xl font-bold uppercase mb-5 flex items-center gap-3" style="color:${themeColor}"><i data-lucide="briefcase" class="w-6 h-6"></i> Pengalaman</h3><div class="border-l-2 border-slate-200 ml-3 pl-6 space-y-8">${safeExp.map(e => `<div class="relative"><div class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-white border-4 shadow-sm" style="border-color:${themeColor}"></div><div class="text-xs font-black px-2 py-1 bg-slate-100 inline-block rounded mb-2" style="color:${themeColor}">${e.date}</div><h4 class="font-bold text-slate-800 text-base">${e.title}</h4><div class="text-sm font-semibold text-slate-500 mb-2">${e.company}</div><p class="text-xs text-slate-600 leading-relaxed">${e.desc}</p></div>`).join('')}</div></div>` : ''}
+                                ${safeEdu.length > 0 ? `<div><h3 class="text-xl font-bold uppercase mb-5 flex items-center gap-3" style="color:${themeColor}"><i data-lucide="graduation-cap" class="w-6 h-6"></i> Pendidikan</h3><div class="space-y-4">${safeEdu.map(e => `<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 border-l-4" style="border-left-color:${themeColor}"><h4 class="font-bold text-slate-800 text-sm">${e.degree}</h4><div class="flex justify-between items-center text-xs font-semibold text-slate-500 mt-1"><span>${e.school}</span><span class="bg-slate-100 px-2 py-1 rounded">${e.date}</span></div><p class="text-xs text-slate-600 mt-2">${e.desc}</p></div>`).join('')}</div></div>` : ''}
+                            </div>
+                            <div class="w-[35%]">
+                                <div class="bg-white p-6 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 mb-8 relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-slate-100 to-transparent rounded-bl-full"></div>
+                                    <h3 class="text-sm font-bold uppercase mb-5 tracking-wider" style="color:${themeColor}">Kontak</h3>
+                                    <div class="space-y-4 text-xs font-medium text-slate-600">
+                                        ${personal.email ? `<div class="flex items-center gap-3 break-all"><div class="p-2 rounded-lg text-white shadow-md" style="background:${themeColor}"><i data-lucide="mail" class="w-4 h-4"></i></div> ${personal.email}</div>` : ''}
+                                        ${personal.phone ? `<div class="flex items-center gap-3"><div class="p-2 rounded-lg text-white shadow-md" style="background:${themeColor}"><i data-lucide="phone" class="w-4 h-4"></i></div> ${personal.phone}</div>` : ''}
+                                        ${personal.address ? `<div class="flex items-center gap-3"><div class="p-2 rounded-lg text-white shadow-md" style="background:${themeColor}"><i data-lucide="map-pin" class="w-4 h-4"></i></div> ${personal.address}</div>` : ''}
+                                        ${personal.web ? `<div class="flex items-center gap-3 break-all"><div class="p-2 rounded-lg text-white shadow-md" style="background:${themeColor}"><i data-lucide="globe" class="w-4 h-4"></i></div> ${personal.web}</div>` : ''}
+                                    </div>
+                                </div>
+                                ${skills.length > 0 ? `<div class="mb-8"><h3 class="text-sm font-bold uppercase mb-4 tracking-wider" style="color:${themeColor}">Keahlian</h3><div class="flex flex-wrap gap-2">${skills.map(s => `<span class="text-xs font-bold px-3 py-1.5 rounded-lg border bg-white shadow-sm text-slate-700 hover:-translate-y-0.5 transition-transform" style="border-color:${themeColor}30">${s}</span>`).join('')}</div></div>` : ''}
+                                ${languages.length > 0 ? `<div><h3 class="text-sm font-bold uppercase mb-4 tracking-wider" style="color:${themeColor}">Bahasa</h3><div class="space-y-3 text-sm font-semibold text-slate-700">${languages.map(l => `<div class="flex items-center gap-3 bg-white p-2 rounded-lg border border-slate-100 shadow-sm"><div class="w-2 h-2 rounded-full" style="background:${themeColor}"></div>${l}</div>`).join('')}</div></div>` : ''}
+                            </div>
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+            // 6. DARK
+            else if (tpl === 'dark') {
+                htmlContent = `
+                    <div class="h-full w-full flex flex-col ${cvData.settings.font} bg-[#0f172a] text-white p-4 relative">
+                        <div class="absolute inset-4 border-2 pointer-events-none z-10" style="border-color:${themeColor}40"></div>
+                        <div class="absolute inset-[22px] border pointer-events-none z-10" style="border-color:${themeColor}20"></div>
+                        <div class="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTAgMGgyMHYyMEgweiIgZmlsbD0ibm9uZSIvPjxjaXJjbGUgY3g9IjIiIGN5PSIyIiByPSIyIiBmaWxsPSIjZmZmIi8+PC9zdmc+')]"></div>
+                        
+                        <div class="flex-1 flex relative z-20">
+                            <div class="w-[35%] bg-[#1e293b]/80 p-10 border-r border-slate-800/50 flex flex-col backdrop-blur-sm m-4 mr-0 rounded-l-lg">
+                                ${personal.photo ? `<img src="${personal.photo}" class="w-36 h-36 object-cover rounded-full mx-auto mb-10 border-2 shadow-2xl grayscale hover:grayscale-0 transition-all" style="border-color:${themeColor}">` : ''}
+                                <div class="mb-12">
+                                    <h3 class="text-xs font-bold uppercase tracking-[0.2em] mb-5" style="color:${themeColor}">Hubungi</h3>
+                                    <div class="space-y-5 text-xs text-slate-300 font-medium">
+                                        ${personal.phone ? `<p class="flex items-center gap-3"><i data-lucide="phone" class="w-4 h-4 opacity-70"></i> ${personal.phone}</p>` : ''}
+                                        ${personal.email ? `<p class="flex items-center gap-3 break-all"><i data-lucide="mail" class="w-4 h-4 opacity-70"></i> ${personal.email}</p>` : ''}
+                                        ${personal.address ? `<p class="flex items-center gap-3"><i data-lucide="map-pin" class="w-4 h-4 opacity-70"></i> ${personal.address}</p>` : ''}
+                                        ${personal.web ? `<p class="flex items-center gap-3 break-all" style="color:${themeColor}"><i data-lucide="globe" class="w-4 h-4 opacity-70"></i> ${personal.web}</p>` : ''}
+                                    </div>
+                                </div>
+                                ${skills.length > 0 ? `<div class="mb-12"><h3 class="text-xs font-bold uppercase tracking-[0.2em] mb-5" style="color:${themeColor}">Keahlian</h3><ul class="space-y-3 text-xs text-slate-300 font-medium">${skills.map(s => `<li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rotate-45" style="background:${themeColor}"></div> ${s}</li>`).join('')}</ul></div>` : ''}
+                                ${languages.length > 0 ? `<div><h3 class="text-xs font-bold uppercase tracking-[0.2em] mb-5" style="color:${themeColor}">Bahasa</h3><ul class="space-y-3 text-xs text-slate-300 font-medium">${languages.map(l => `<li class="flex items-center gap-2"><div class="w-1.5 h-1.5 rotate-45" style="background:${themeColor}"></div> ${l}</li>`).join('')}</ul></div>` : ''}
+                            </div>
+                            
+                            <div class="w-[65%] p-12 bg-transparent">
+                                <div class="mb-12">
+                                    <h1 class="text-5xl font-playfair font-bold mb-3 tracking-wide text-white drop-shadow-lg">${personal.name || 'Nama Lengkap'}</h1>
+                                    <h2 class="text-sm font-bold tracking-[0.3em] uppercase" style="color:${themeColor}">${personal.title || 'Profesi'}</h2>
+                                </div>
+                                ${personal.about ? `<div class="mb-12"><p class="text-sm text-slate-300 leading-relaxed font-light text-justify border-l-2 pl-4" style="border-color:${themeColor}50">${personal.about}</p></div>` : ''}
+                                
+                                ${safeExp.length > 0 ? `
+                                <div class="mb-12">
+                                    <h3 class="text-sm font-bold uppercase tracking-[0.2em] mb-6 pb-3 border-b border-slate-800 flex items-center gap-3" style="color:${themeColor}"><i data-lucide="briefcase" class="w-5 h-5"></i> Pengalaman</h3>
+                                    <div class="space-y-8 pl-2">
+                                        ${safeExp.map(e => `
+                                            <div class="relative">
+                                                <div class="absolute -left-5 top-1.5 w-1.5 h-1.5 rotate-45" style="background:${themeColor}"></div>
+                                                <h4 class="font-bold text-base mb-1 text-slate-100">${e.title}</h4>
+                                                <div class="flex justify-between items-center text-xs mb-3 font-medium">
+                                                    <span style="color:${themeColor}">${e.company}</span>
+                                                    <span class="text-slate-500 bg-slate-800/50 px-2 py-1 rounded border border-slate-700">${e.date}</span>
+                                                </div>
+                                                <p class="text-xs text-slate-400 leading-relaxed font-light">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                                
+                                ${safeEdu.length > 0 ? `
+                                <div>
+                                    <h3 class="text-sm font-bold uppercase tracking-[0.2em] mb-6 pb-3 border-b border-slate-800 flex items-center gap-3" style="color:${themeColor}"><i data-lucide="graduation-cap" class="w-5 h-5"></i> Pendidikan</h3>
+                                    <div class="space-y-6 pl-2">
+                                        ${safeEdu.map(e => `
+                                            <div class="relative">
+                                                <div class="absolute -left-5 top-1.5 w-1.5 h-1.5 rotate-45" style="background:${themeColor}"></div>
+                                                <h4 class="font-bold text-base mb-1 text-slate-100">${e.degree}</h4>
+                                                <div class="flex justify-between items-center text-xs mb-2 font-medium">
+                                                    <span class="text-slate-300">${e.school}</span>
+                                                    <span class="text-slate-500">${e.date}</span>
+                                                </div>
+                                                <p class="text-xs text-slate-400 font-light">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+            // 7. CORPORATE
+            else if (tpl === 'corporate') {
+                htmlContent = `
+                    <div class="h-full w-full bg-paper ${cvData.settings.font} flex flex-col text-slate-800 relative">
+                        <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none overflow-hidden">
+                            <i data-lucide="building" class="w-[500px] h-[500px] text-slate-900"></i>
+                        </div>
+                        
+                        <div class="p-12 pb-10 flex items-center justify-between relative z-10 bg-slate-50 border-b border-slate-200">
+                            <div class="absolute top-0 left-0 w-full h-3" style="background: ${themeColor}"></div>
+                            <div class="absolute top-0 left-12 w-24 h-6 rounded-b-md" style="background: ${themeColor}40"></div>
+                            <div class="absolute bottom-0 right-0 w-1/3 h-1" style="background: ${themeColor}"></div>
+                            
+                            <div class="pr-8 pt-4">
+                                <h1 class="text-5xl font-black uppercase tracking-tight text-slate-900 drop-shadow-sm">${personal.name || 'NAMA LENGKAP'}</h1>
+                                <h2 class="text-xl font-bold mt-2 tracking-widest" style="color: ${themeColor}">${personal.title || 'POSISI / PROFESI'}</h2>
+                                ${personal.about ? `<p class="mt-5 text-sm text-slate-600 max-w-2xl leading-relaxed font-medium border-l-4 pl-4 bg-white/50 py-2 rounded-r" style="border-color:${themeColor}">${personal.about}</p>` : ''}
+                            </div>
+                            ${personal.photo ? `<img src="${personal.photo}" class="w-32 h-32 rounded-xl object-cover shadow-lg flex-shrink-0 border-2 border-white mt-4">` : ''}
+                        </div>
+                        
+                        <div class="flex flex-1 relative z-10">
+                            <div class="w-[65%] p-12 pr-10 border-r border-slate-200">
+                                ${safeExp.length > 0 ? `
+                                <div class="mb-10">
+                                    <h3 class="text-xl font-black uppercase tracking-wider mb-6 pb-2 border-b-2 text-slate-800 flex items-center gap-3" style="border-color: ${themeColor}40">
+                                        <div class="w-2 h-6" style="background:${themeColor}"></div> Pengalaman Profesional
+                                    </h3>
+                                    <div class="space-y-8">
+                                        ${safeExp.map(e => `
+                                            <div>
+                                                <div class="flex justify-between items-center mb-1">
+                                                    <h4 class="font-bold text-slate-900 text-lg">${e.title}</h4>
+                                                    <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200">${e.date}</span>
+                                                </div>
+                                                <div class="text-sm font-bold mb-2 uppercase tracking-wide" style="color:${themeColor}">${e.company}</div>
+                                                <p class="text-sm text-slate-600 leading-relaxed">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                                
+                                ${safeEdu.length > 0 ? `
+                                <div>
+                                    <h3 class="text-xl font-black uppercase tracking-wider mb-6 pb-2 border-b-2 text-slate-800 flex items-center gap-3" style="border-color: ${themeColor}40">
+                                        <div class="w-2 h-6" style="background:${themeColor}"></div> Riwayat Pendidikan
+                                    </h3>
+                                    <div class="space-y-6">
+                                        ${safeEdu.map(e => `
+                                            <div>
+                                                <div class="flex justify-between items-center mb-1">
+                                                    <h4 class="font-bold text-slate-900 text-base">${e.degree}</h4>
+                                                    <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200">${e.date}</span>
+                                                </div>
+                                                <div class="text-sm font-bold text-slate-700 mb-1">${e.school}</div>
+                                                <p class="text-sm text-slate-600">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                            
+                            <div class="w-[35%] p-10 bg-slate-50/80">
+                                <div class="mb-10">
+                                    <h3 class="text-sm font-black uppercase tracking-wider mb-5 pb-2 border-b-2 text-slate-800" style="border-color: ${themeColor}40">Informasi Kontak</h3>
+                                    <div class="space-y-4 text-xs font-bold text-slate-600">
+                                        ${personal.phone ? `<div class="flex items-center gap-3"><div class="w-8 h-8 rounded bg-white shadow-sm border border-slate-100 flex items-center justify-center"><i data-lucide="phone" class="w-4 h-4" style="color:${themeColor}"></i></div> ${personal.phone}</div>` : ''}
+                                        ${personal.email ? `<div class="flex items-center gap-3 break-all"><div class="w-8 h-8 rounded bg-white shadow-sm border border-slate-100 flex items-center justify-center"><i data-lucide="mail" class="w-4 h-4" style="color:${themeColor}"></i></div> ${personal.email}</div>` : ''}
+                                        ${personal.address ? `<div class="flex items-center gap-3"><div class="w-8 h-8 rounded bg-white shadow-sm border border-slate-100 flex items-center justify-center"><i data-lucide="map-pin" class="w-4 h-4" style="color:${themeColor}"></i></div> ${personal.address}</div>` : ''}
+                                        ${personal.web ? `<div class="flex items-center gap-3 break-all"><div class="w-8 h-8 rounded bg-white shadow-sm border border-slate-100 flex items-center justify-center"><i data-lucide="globe" class="w-4 h-4" style="color:${themeColor}"></i></div> <span>${personal.web}</span></div>` : ''}
+                                    </div>
+                                </div>
+                                ${skills.length > 0 ? `
+                                <div class="mb-10">
+                                    <h3 class="text-sm font-black uppercase tracking-wider mb-5 pb-2 border-b-2 text-slate-800" style="border-color: ${themeColor}40">Kompetensi Inti</h3>
+                                    <div class="flex flex-col gap-3">
+                                        ${skills.map(s => `<div class="text-xs font-bold px-4 py-2 bg-white border-l-4 rounded shadow-sm text-slate-700" style="border-color:${themeColor}">${s}</div>`).join('')}
+                                    </div>
+                                </div>` : ''}
+                                ${languages.length > 0 ? `
+                                <div>
+                                    <h3 class="text-sm font-black uppercase tracking-wider mb-5 pb-2 border-b-2 text-slate-800" style="border-color: ${themeColor}40">Bahasa</h3>
+                                    <ul class="text-sm font-bold text-slate-700 space-y-3">
+                                        ${languages.map(l => `<li class="flex items-center gap-3"><div class="w-2 h-2 rounded-full shadow-sm" style="background:${themeColor}"></div>${l}</li>`).join('')}
+                                    </ul>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+            // 8. TECH
+            else if (tpl === 'tech') {
+                htmlContent = `
+                    <div class="h-full w-full bg-[#f8fafc] bg-grid ${cvData.settings.font} p-8 flex flex-col gap-6 text-slate-800 relative">
+                        <div class="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white opacity-80 pointer-events-none"></div>
+                        
+                        <div class="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex items-center gap-8 border border-slate-200/80 relative z-10">
+                            ${personal.photo ? `<img src="${personal.photo}" class="w-32 h-32 rounded-2xl object-cover shadow-lg flex-shrink-0 ring-4 ring-white">` : ''}
+                            <div class="flex-1">
+                                <h1 class="text-5xl font-extrabold text-slate-900 tracking-tight mb-1">${personal.name || 'Nama Lengkap'}</h1>
+                                <h2 class="text-lg font-bold mb-5 inline-block px-3 py-1 rounded-lg bg-slate-100 shadow-inner border border-slate-200/50" style="color: ${themeColor}">${personal.title || 'Tech / Startup Role'}</h2>
+                                <div class="flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-slate-600">
+                                    ${personal.email ? `<span class="flex items-center gap-2 bg-white px-2 py-1 rounded-md shadow-sm border border-slate-100"><i data-lucide="mail" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.email}</span>` : ''}
+                                    ${personal.phone ? `<span class="flex items-center gap-2 bg-white px-2 py-1 rounded-md shadow-sm border border-slate-100"><i data-lucide="smartphone" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.phone}</span>` : ''}
+                                    ${personal.web ? `<span class="flex items-center gap-2 bg-white px-2 py-1 rounded-md shadow-sm border border-slate-100"><i data-lucide="link" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.web}</span>` : ''}
+                                    ${personal.address ? `<span class="flex items-center gap-2 bg-white px-2 py-1 rounded-md shadow-sm border border-slate-100"><i data-lucide="map-pin" class="w-4 h-4" style="color:${themeColor}"></i> ${personal.address}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-6 flex-1 relative z-10">
+                            <div class="w-[65%] flex flex-col gap-6">
+                                ${personal.about ? `
+                                <div class="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-slate-200/80">
+                                    <h3 class="text-sm font-black uppercase text-slate-400 mb-4 tracking-widest flex items-center gap-2"><i data-lucide="terminal" class="w-4 h-4"></i> About Me</h3>
+                                    <p class="text-sm text-slate-700 leading-relaxed font-medium">${personal.about}</p>
+                                </div>` : ''}
+                                
+                                ${safeExp.length > 0 ? `
+                                <div class="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-slate-200/80 flex-1">
+                                    <h3 class="text-sm font-black uppercase text-slate-400 mb-6 tracking-widest flex items-center gap-2"><i data-lucide="briefcase" class="w-4 h-4"></i> Experience</h3>
+                                    <div class="space-y-8">
+                                        ${safeExp.map(e => `
+                                            <div class="relative pl-5 border-l-2" style="border-color:${themeColor}30">
+                                                <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-white border-4 shadow-sm" style="border-color:${themeColor}"></div>
+                                                <h4 class="font-bold text-slate-900 text-lg">${e.title}</h4>
+                                                <div class="flex items-center gap-2 text-sm font-bold mb-3 mt-1">
+                                                    <span style="color:${themeColor}">${e.company}</span>
+                                                    <span class="text-slate-300">•</span>
+                                                    <span class="text-slate-500 bg-slate-100 px-2 py-0.5 rounded text-xs border border-slate-200">${e.date}</span>
+                                                </div>
+                                                <p class="text-sm text-slate-600 leading-relaxed font-medium">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                            
+                            <div class="w-[35%] flex flex-col gap-6">
+                                ${skills.length > 0 ? `
+                                <div class="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-slate-200/80">
+                                    <h3 class="text-sm font-black uppercase text-slate-400 mb-5 tracking-widest flex items-center gap-2"><i data-lucide="cpu" class="w-4 h-4"></i> Tech Stack</h3>
+                                    <div class="flex flex-wrap gap-2.5">
+                                        ${skills.map(s => `<span class="text-xs font-bold px-3 py-2 rounded-xl bg-slate-50 text-slate-700 border border-slate-200 shadow-sm hover:-translate-y-1 transition-transform" style="color:${themeColor}">${s}</span>`).join('')}
+                                    </div>
+                                </div>` : ''}
+                                
+                                ${safeEdu.length > 0 ? `
+                                <div class="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-slate-200/80 flex-1">
+                                    <h3 class="text-sm font-black uppercase text-slate-400 mb-5 tracking-widest flex items-center gap-2"><i data-lucide="graduation-cap" class="w-4 h-4"></i> Education</h3>
+                                    <div class="space-y-6">
+                                        ${safeEdu.map(e => `
+                                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
+                                                <h4 class="text-sm font-bold text-slate-900 mb-1">${e.degree}</h4>
+                                                <div class="text-xs font-bold text-slate-600 mb-2">${e.school}</div>
+                                                <div class="text-[10px] font-black inline-block px-2 py-1 rounded bg-white shadow-sm border border-slate-100" style="color:${themeColor}">${e.date}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+            // 9. EXECUTIVE
+            else if (tpl === 'executive') {
+                htmlContent = `
+                    <div class="h-full w-full bg-cream-paper p-12 ${cvData.settings.font} text-slate-900 relative">
+                        <!-- Classic Certificate Border -->
+                        <div class="absolute inset-5 border-[4px] pointer-events-none shadow-sm rounded-sm" style="border-color: ${themeColor}"></div>
+                        <div class="absolute inset-[26px] border pointer-events-none rounded-sm" style="border-color: ${themeColor}80"></div>
+                        <div class="absolute inset-[30px] border pointer-events-none opacity-20" style="border-color: ${themeColor}"></div>
+                        
+                        <div class="relative z-10 p-6 pt-4">
+                            <div class="text-center mb-10">
+                                ${personal.photo ? `<img src="${personal.photo}" class="w-28 h-28 rounded-full object-cover mx-auto mb-6 shadow-md border-4 border-white">` : ''}
+                                <h1 class="text-4xl font-playfair font-bold uppercase tracking-[0.15em] text-slate-900 mb-3 drop-shadow-sm">${personal.name || 'NAMA LENGKAP'}</h1>
+                                <h2 class="text-sm font-bold tracking-[0.4em] uppercase bg-white/50 py-1 px-4 inline-block rounded border border-slate-200/50" style="color: ${themeColor}">${personal.title || 'Posisi Eksekutif'}</h2>
+                                <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 text-xs text-slate-700 font-semibold">
+                                    ${personal.phone ? `<span>${personal.phone}</span>` : ''}
+                                    ${personal.phone && personal.email ? `<span class="text-slate-300">◆</span>` : ''}
+                                    ${personal.email ? `<span>${personal.email}</span>` : ''}
+                                    ${(personal.phone || personal.email) && personal.address ? `<span class="text-slate-300">◆</span>` : ''}
+                                    ${personal.address ? `<span>${personal.address}</span>` : ''}
+                                </div>
+                            </div>
+                            
+                            <!-- Elegant Divider -->
+                            <div class="w-3/4 mx-auto h-px bg-slate-300 mb-10 relative flex justify-center shadow-sm">
+                                <div class="absolute -top-1.5 w-3 h-3 rotate-45 bg-[#fcfbf9] border border-slate-300 flex items-center justify-center">
+                                    <div class="w-1 h-1 shadow-sm" style="background: ${themeColor}"></div>
+                                </div>
+                            </div>
+
+                            ${personal.about ? `
+                            <div class="mb-10 text-center max-w-2xl mx-auto">
+                                <p class="text-sm text-slate-700 leading-relaxed font-playfair italic font-medium bg-white/40 p-4 rounded border border-slate-200/50">"${personal.about}"</p>
+                            </div>` : ''}
+
+                            <div class="flex gap-12">
+                                <div class="w-[65%]">
+                                    ${safeExp.length > 0 ? `
+                                    <div class="mb-12">
+                                        <h3 class="text-lg font-playfair font-bold uppercase tracking-widest mb-6 flex items-center gap-4">
+                                            <span style="color:${themeColor}">Pengalaman Profesional</span>
+                                            <div class="flex-1 h-px bg-slate-300"></div>
+                                        </h3>
+                                        <div class="space-y-8">
+                                            ${safeExp.map(e => `
+                                                <div>
+                                                    <div class="flex justify-between items-baseline mb-1">
+                                                        <h4 class="font-bold text-slate-900 text-base">${e.title}</h4>
+                                                        <span class="text-xs font-bold text-slate-500 border-b border-slate-300">${e.date}</span>
+                                                    </div>
+                                                    <div class="text-sm font-playfair font-bold italic mb-3" style="color:${themeColor}">${e.company}</div>
+                                                    <p class="text-xs text-slate-700 leading-relaxed font-medium">${e.desc}</p>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>` : ''}
+                                    
+                                    ${safeEdu.length > 0 ? `
+                                    <div>
+                                        <h3 class="text-lg font-playfair font-bold uppercase tracking-widest mb-6 flex items-center gap-4">
+                                            <span style="color:${themeColor}">Pendidikan</span>
+                                            <div class="flex-1 h-px bg-slate-300"></div>
+                                        </h3>
+                                        <div class="space-y-6">
+                                            ${safeEdu.map(e => `
+                                                <div>
+                                                    <div class="flex justify-between items-baseline mb-1">
+                                                        <h4 class="font-bold text-slate-900">${e.degree}</h4>
+                                                        <span class="text-xs font-bold text-slate-500 border-b border-slate-300">${e.date}</span>
+                                                    </div>
+                                                    <div class="text-sm font-playfair font-bold italic text-slate-600">${e.school}</div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>` : ''}
+                                </div>
+                                
+                                <div class="w-[35%] border-l border-slate-300 pl-10">
+                                    ${skills.length > 0 ? `
+                                    <div class="mb-12">
+                                        <h3 class="text-sm font-playfair font-bold uppercase tracking-widest mb-6 border-b border-slate-300 pb-2" style="color:${themeColor}">Kompetensi Inti</h3>
+                                        <ul class="text-xs text-slate-800 space-y-3 font-semibold">
+                                            ${skills.map(s => `<li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rotate-45 shadow-sm" style="background:${themeColor}"></div> ${s}</li>`).join('')}
+                                        </ul>
+                                    </div>` : ''}
+                                    
+                                    ${languages.length > 0 ? `
+                                    <div>
+                                        <h3 class="text-sm font-playfair font-bold uppercase tracking-widest mb-6 border-b border-slate-300 pb-2" style="color:${themeColor}">Bahasa</h3>
+                                        <ul class="text-xs text-slate-800 space-y-3 font-semibold">
+                                            ${languages.map(l => `<li class="flex items-center gap-3"><div class="w-1.5 h-1.5 rotate-45 shadow-sm" style="background:${themeColor}"></div> ${l}</li>`).join('')}
+                                        </ul>
+                                    </div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+            // 10. SPLIT BOLD
+            else if (tpl === 'split') {
+                htmlContent = `
+                    <div class="h-full w-full flex ${cvData.settings.font} relative overflow-hidden bg-paper">
+                        <div class="w-[35%] text-white p-12 flex flex-col justify-between relative shadow-[inset_-10px_0_20px_rgba(0,0,0,0.1)]" style="background: ${themeColor}">
+                            <!-- Dark side pattern -->
+                            <div class="absolute inset-0 opacity-10 mix-blend-overlay bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PHBhdGggZD0iTTAgMGwyMCAyME0yMCAwbC0yMCAyMCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiLz48L3N2Zz4=')]"></div>
+                            
+                            <div class="relative z-10">
+                                ${personal.photo ? `<img src="${personal.photo}" class="w-48 h-48 rounded-full object-cover mx-auto mb-12 border-8 border-white/20 shadow-2xl">` : ''}
+                                
+                                <div class="mb-12">
+                                    <h3 class="text-xs font-black uppercase tracking-widest mb-6 opacity-80 border-b border-white/20 pb-2">Kontak</h3>
+                                    <div class="space-y-5 text-sm font-medium">
+                                        ${personal.phone ? `<div class="flex items-center gap-4"><div class="p-2 bg-white/10 rounded-lg shadow-inner"><i data-lucide="phone" class="w-4 h-4"></i></div> ${personal.phone}</div>` : ''}
+                                        ${personal.email ? `<div class="flex items-center gap-4 break-all"><div class="p-2 bg-white/10 rounded-lg shadow-inner"><i data-lucide="mail" class="w-4 h-4"></i></div> ${personal.email}</div>` : ''}
+                                        ${personal.address ? `<div class="flex items-center gap-4"><div class="p-2 bg-white/10 rounded-lg shadow-inner"><i data-lucide="map-pin" class="w-4 h-4"></i></div> ${personal.address}</div>` : ''}
+                                        ${personal.web ? `<div class="flex items-center gap-4 break-all"><div class="p-2 bg-white/10 rounded-lg shadow-inner"><i data-lucide="globe" class="w-4 h-4"></i></div> ${personal.web}</div>` : ''}
+                                    </div>
+                                </div>
+                                
+                                ${skills.length > 0 ? `
+                                <div class="mb-12">
+                                    <h3 class="text-xs font-black uppercase tracking-widest mb-6 opacity-80 border-b border-white/20 pb-2">Keahlian</h3>
+                                    <div class="flex flex-col gap-3">
+                                        ${skills.map(s => `<div class="text-sm font-bold px-4 py-2 bg-white/10 rounded-lg shadow-sm border border-white/10 backdrop-blur-sm">${s}</div>`).join('')}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                            
+                            ${languages.length > 0 ? `
+                            <div class="relative z-10">
+                                <h3 class="text-xs font-black uppercase tracking-widest mb-6 opacity-80 border-b border-white/20 pb-2">Bahasa</h3>
+                                <ul class="text-sm font-medium space-y-3">
+                                    ${languages.map(l => `<li class="flex items-center gap-3"><div class="w-2 h-2 rounded-full bg-white shadow-sm"></div> ${l}</li>`).join('')}
+                                </ul>
+                            </div>` : ''}
+                        </div>
+                        
+                        <div class="w-[65%] p-14 text-slate-800 flex flex-col relative z-10">
+                            <div class="mb-12">
+                                <h1 class="text-[4rem] font-black text-slate-900 mb-2 uppercase tracking-tighter leading-[0.9] drop-shadow-sm">${personal.name || 'NAMA'}</h1>
+                                <h2 class="text-2xl font-bold mt-4 tracking-wider bg-slate-100 py-1 px-3 inline-block rounded" style="color: ${themeColor}">${personal.title || 'Posisi'}</h2>
+                            </div>
+                            
+                            ${personal.about ? `
+                            <div class="mb-12">
+                                <p class="text-sm text-slate-600 leading-relaxed font-semibold border-l-4 pl-5 bg-white py-2 rounded-r shadow-sm" style="border-color:${themeColor}">${personal.about}</p>
+                            </div>` : ''}
+                            
+                            ${safeExp.length > 0 ? `
+                            <div class="mb-12">
+                                <h3 class="text-2xl font-black uppercase mb-8 flex items-center gap-4 text-slate-900">
+                                    <div class="w-12 h-1.5 rounded-full shadow-sm" style="background:${themeColor}"></div> Pengalaman
+                                </h3>
+                                <div class="space-y-8 pl-5 border-l-2 border-slate-200">
+                                    ${safeExp.map(e => `
+                                        <div class="relative">
+                                            <div class="absolute -left-[27px] top-1.5 w-3 h-3 rounded-full border-2 border-white shadow-sm" style="background:${themeColor}"></div>
+                                            <div class="flex justify-between items-end mb-1">
+                                                <h4 class="font-bold text-slate-900 text-xl leading-none">${e.title}</h4>
+                                                <span class="text-xs font-black text-slate-400 bg-white shadow-sm px-3 py-1.5 rounded-md border border-slate-100">${e.date}</span>
+                                            </div>
+                                            <div class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wide">${e.company}</div>
+                                            <p class="text-sm text-slate-600 leading-relaxed font-medium bg-white p-3 rounded-md shadow-sm border border-slate-50">${e.desc}</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>` : ''}
+                            
+                            ${safeEdu.length > 0 ? `
+                            <div>
+                                <h3 class="text-2xl font-black uppercase mb-8 flex items-center gap-4 text-slate-900">
+                                    <div class="w-12 h-1.5 rounded-full shadow-sm" style="background:${themeColor}"></div> Pendidikan
+                                </h3>
+                                <div class="space-y-6 pl-5 border-l-2 border-slate-200">
+                                    ${safeEdu.map(e => `
+                                        <div class="relative">
+                                            <div class="absolute -left-[27px] top-1.5 w-3 h-3 rounded-full border-2 border-white shadow-sm" style="background:${themeColor}"></div>
+                                            <h4 class="font-bold text-slate-900 text-lg">${e.degree}</h4>
+                                            <div class="flex justify-between items-center mt-1">
+                                                <span class="text-sm font-bold text-slate-500">${e.school}</span>
+                                                <span class="text-xs font-black text-slate-400 bg-white px-2 py-1 shadow-sm rounded border border-slate-100">${e.date}</span>
+                                            </div>
+                                            <p class="text-sm text-slate-600 mt-2 font-medium">${e.desc}</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>` : ''}
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+            // 11. DEVELOPER (True IDE terminal look, scanlines)
+            else if (tpl === 'developer') {
+                htmlContent = `
+                    <div class="h-full w-full bg-[#0d1117] text-[#c9d1d9] p-10 font-mono relative overflow-hidden flex flex-col">
+                        <!-- Scanline Effect -->
+                        <div class="absolute inset-0 pointer-events-none opacity-5 mix-blend-overlay" style="background: repeating-linear-gradient(0deg, transparent, transparent 2px, #000 2px, #000 4px);"></div>
+                        
+                        <!-- IDE Header -->
+                        <div class="bg-[#161b22] border border-[#30363d] rounded-t-xl p-3 flex items-center gap-2 relative z-10 shadow-lg">
+                            <div class="w-3 h-3 rounded-full bg-[#ff5f56] shadow-inner"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#ffbd2e] shadow-inner"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#27c93f] shadow-inner"></div>
+                            <div class="mx-auto text-xs font-bold text-[#8b949e] bg-[#0d1117] px-4 py-1 rounded-md border border-[#30363d]">cv_builder.js — ${personal.name || 'Developer'}</div>
+                        </div>
+
+                        <div class="border border-t-0 border-[#30363d] bg-[#0d1117] p-8 flex-1 relative z-10 rounded-b-xl shadow-2xl flex flex-col">
+                            <div class="flex justify-between items-start mb-8 pb-8 border-b border-[#30363d] border-dashed">
+                                <div class="text-sm leading-loose">
+                                    <div class="text-[#8b949e]">/**</div>
+                                    <div class="text-[#8b949e]"> * <span class="text-white font-bold text-lg">Developer Profile</span></div>
+                                    <div class="text-[#8b949e]"> */</div>
+                                    <div class="mt-2"><span style="color:${themeColor}">const</span> <span class="text-[#79c0ff]">profile</span> <span style="color:${themeColor}">=</span> {</div>
+                                    <div class="ml-8 border-l border-[#30363d] pl-4">
+                                        <div><span class="text-[#7ee787]">name:</span> <span class="text-[#a5d6ff]">"${personal.name || 'Name'}"</span>,</div>
+                                        <div><span class="text-[#7ee787]">role:</span> <span class="text-[#a5d6ff]">"${personal.title || 'Role'}"</span>,</div>
+                                        ${personal.email ? `<div><span class="text-[#7ee787]">email:</span> <span class="text-[#a5d6ff]">"${personal.email}"</span>,</div>` : ''}
+                                        ${personal.phone ? `<div><span class="text-[#7ee787]">phone:</span> <span class="text-[#a5d6ff]">"${personal.phone}"</span>,</div>` : ''}
+                                        ${personal.web ? `<div><span class="text-[#7ee787]">github:</span> <span class="text-[#a5d6ff]">"${personal.web}"</span>,</div>` : ''}
+                                    </div>
+                                    <div>};</div>
+                                </div>
+                                ${personal.photo ? `<img src="${personal.photo}" class="w-32 h-32 rounded-lg object-cover border-2 border-[#30363d] shadow-lg grayscale hover:grayscale-0 transition-all p-1 bg-[#161b22]">` : ''}
+                            </div>
+
+                            <div class="flex gap-8 flex-1">
+                                <div class="w-[60%] flex flex-col gap-6">
+                                    ${personal.about ? `
+                                    <div>
+                                        <div class="text-[#8b949e] mb-2">> cat about.txt</div>
+                                        <p class="text-sm leading-relaxed text-[#c9d1d9] bg-[#161b22] p-4 rounded border border-[#30363d] shadow-inner">${personal.about}</p>
+                                    </div>` : ''}
+                                    
+                                    ${safeExp.length > 0 ? `
+                                    <div class="flex-1">
+                                        <div class="text-[#8b949e] mb-3">> ./show_experience.sh</div>
+                                        <div class="space-y-4 border-l-2 border-[#30363d] pl-4">
+                                            ${safeExp.map(e => `
+                                                <div class="relative hover:bg-[#161b22] p-2 rounded transition-colors border border-transparent hover:border-[#30363d]">
+                                                    <div class="absolute -left-[23px] top-2 w-2 h-2 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.5)]" style="background:${themeColor}"></div>
+                                                    <div class="flex justify-between text-sm mb-1">
+                                                        <span class="text-white font-bold">${e.title}</span>
+                                                        <span class="text-[#8b949e]">[${e.date}]</span>
+                                                    </div>
+                                                    <div class="text-sm text-[#79c0ff] mb-2">@ ${e.company}</div>
+                                                    <p class="text-xs text-[#8b949e] leading-relaxed">${e.desc}</p>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>` : ''}
+                                </div>
+                                
+                                <div class="w-[40%] flex flex-col gap-6">
+                                    ${skills.length > 0 ? `
+                                    <div>
+                                        <div class="text-[#8b949e] mb-3">> npm list --depth=0</div>
+                                        <div class="flex flex-col gap-2">
+                                            ${skills.map(s => `<div class="text-xs px-3 py-2 bg-[#161b22] border border-[#30363d] rounded text-[#c9d1d9] flex items-center gap-2 hover:border-[#8b949e] transition-colors"><i data-lucide="chevron-right" class="w-3 h-3" style="color:${themeColor}"></i>${s}</div>`).join('')}
+                                        </div>
+                                    </div>` : ''}
+                                    
+                                    ${safeEdu.length > 0 ? `
+                                    <div>
+                                        <div class="text-[#8b949e] mb-3">> cat education.json</div>
+                                        <div class="space-y-3">
+                                            ${safeEdu.map(e => `
+                                                <div class="bg-[#161b22] border border-[#30363d] p-3 rounded shadow-inner">
+                                                    <div class="text-sm text-white font-bold mb-1">${e.degree}</div>
+                                                    <div class="text-xs text-[#8b949e]">${e.school}</div>
+                                                    <div class="text-xs text-[#79c0ff] mt-1">> ${e.date}</div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ${!isPremium ? `<div class="absolute bottom-4 left-0 right-0 text-center text-[10px] text-[#8b949e] font-sans z-50">/* Dibuat dengan CV Builder Premium - Studio Jasa Digital */</div>` : ''}
+                    </div>
+                `;
+            }
+            // 12. ACADEMIC
+            else if (tpl === 'academic') {
+                htmlContent = `
+                    <div class="h-full w-full bg-cream-paper p-12 ${cvData.settings.font} text-slate-900 relative">
+                        <!-- Formal Double Border -->
+                        <div class="absolute inset-8 border-[4px] border-slate-900 pointer-events-none shadow-sm rounded-sm"></div>
+                        <div class="absolute inset-[36px] border border-slate-900 pointer-events-none rounded-sm"></div>
+                        <div class="absolute inset-[40px] border border-slate-900 pointer-events-none opacity-20"></div>
+                        
+                        <div class="relative z-10 p-10 h-full flex flex-col">
+                            <div class="border-b-[3px] border-slate-900 pb-8 mb-10 relative">
+                                <div class="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-16 h-[3px] bg-slate-100"></div>
+                                <div class="absolute bottom-[-7px] left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 border-2 border-slate-900 bg-cream-paper"></div>
+                                
+                                <h1 class="text-5xl font-playfair font-black text-center text-slate-900 uppercase tracking-widest mb-3 drop-shadow-sm">${personal.name || 'NAMA LENGKAP'}</h1>
+                                <p class="text-center text-lg font-playfair italic text-slate-700 font-bold" style="color:${themeColor}">${personal.title || 'Posisi Akademik/Profesional'}</p>
+                                <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 text-sm text-slate-800 font-semibold uppercase tracking-wide">
+                                    ${personal.email ? `<span>${personal.email}</span>` : ''}
+                                    ${personal.phone ? `<span>• ${personal.phone}</span>` : ''}
+                                    ${personal.address ? `<span>• ${personal.address}</span>` : ''}
+                                    ${personal.web ? `<span>• ${personal.web}</span>` : ''}
+                                </div>
+                            </div>
+                            
+                            ${personal.about ? `
+                            <div class="mb-10 bg-white/50 p-6 border border-slate-200 shadow-sm rounded">
+                                <p class="text-sm text-slate-800 leading-relaxed text-justify indent-10 font-medium font-playfair text-base">" ${personal.about} "</p>
+                            </div>` : ''}
+
+                            <div class="flex-1">
+                                ${safeEdu.length > 0 ? `
+                                <div class="mb-10">
+                                    <h3 class="text-xl font-playfair font-black text-center uppercase tracking-[0.2em] mb-6 bg-slate-200/50 py-2 border-y-2 border-slate-900 shadow-sm">Riwayat Pendidikan</h3>
+                                    <div class="space-y-6 px-4">
+                                        ${safeEdu.map(e => `
+                                            <div class="flex justify-between items-start">
+                                                <div class="w-3/4">
+                                                    <h4 class="font-bold text-slate-900 text-base uppercase">${e.degree}</h4>
+                                                    <div class="text-base font-playfair italic font-bold mt-1" style="color:${themeColor}">${e.school}</div>
+                                                    <p class="text-sm text-slate-700 mt-2 font-medium">${e.desc}</p>
+                                                </div>
+                                                <div class="w-1/4 text-right text-sm font-black text-slate-800 bg-white px-3 py-1 rounded inline-block h-fit border border-slate-300 shadow-sm">${e.date}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+
+                                ${safeExp.length > 0 ? `
+                                <div class="mb-10">
+                                    <h3 class="text-xl font-playfair font-black text-center uppercase tracking-[0.2em] mb-6 bg-slate-200/50 py-2 border-y-2 border-slate-900 shadow-sm">Pengalaman Profesional</h3>
+                                    <div class="space-y-8 px-4">
+                                        ${safeExp.map(e => `
+                                            <div class="flex justify-between items-start">
+                                                <div class="w-3/4">
+                                                    <h4 class="font-bold text-slate-900 text-base uppercase">${e.title}</h4>
+                                                    <div class="text-base font-playfair italic font-bold mt-1 mb-2" style="color:${themeColor}">${e.company}</div>
+                                                    <p class="text-sm text-slate-800 leading-relaxed font-medium bg-white/40 p-3 rounded border border-slate-200">${e.desc}</p>
+                                                </div>
+                                                <div class="w-1/4 text-right text-sm font-black text-slate-800 bg-white px-3 py-1 rounded inline-block h-fit border border-slate-300 shadow-sm">${e.date}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                                
+                                <div class="flex gap-10 px-4 mt-10 border-t-2 border-slate-900 pt-8 relative">
+                                    <div class="absolute top-[-7px] left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 border-2 border-slate-900 bg-cream-paper"></div>
+                                    ${skills.length > 0 ? `
+                                    <div class="flex-1">
+                                        <h3 class="text-sm font-playfair font-black uppercase tracking-[0.2em] mb-4 text-center">Kompetensi Utama</h3>
+                                        <p class="text-sm text-slate-800 leading-relaxed font-semibold text-center bg-white/50 p-3 rounded border border-slate-200">${skills.join(' &bull; ')}</p>
+                                    </div>` : ''}
+                                    
+                                    ${languages.length > 0 ? `
+                                    <div class="flex-1 border-l-2 border-slate-300 pl-10">
+                                        <h3 class="text-sm font-playfair font-black uppercase tracking-[0.2em] mb-4 text-center">Kemampuan Bahasa</h3>
+                                        <p class="text-sm text-slate-800 leading-relaxed font-semibold text-center bg-white/50 p-3 rounded border border-slate-200">${languages.join(' &bull; ')}</p>
+                                    </div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+            // 13. STARTUP VIBE
+            else if (tpl === 'startup') {
+                htmlContent = `
+                    <div class="h-full w-full bg-[#f8fafc] p-10 flex flex-col ${cvData.settings.font} relative overflow-hidden z-0 bg-grid">
+                        <!-- Abstract Gradient Blobs Background -->
+                        <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full mix-blend-multiply opacity-[0.15] filter blur-[80px] pointer-events-none" style="background:${themeColor}"></div>
+                        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full mix-blend-multiply opacity-[0.1] filter blur-[100px] pointer-events-none bg-indigo-500"></div>
+                        <div class="absolute top-[40%] left-[20%] w-[300px] h-[300px] rounded-full mix-blend-multiply opacity-[0.08] filter blur-[60px] pointer-events-none bg-rose-500"></div>
+
+                        <div class="flex items-center gap-10 mb-10 pb-8 relative z-10">
+                            ${personal.photo ? `
+                            <div class="w-40 h-40 rounded-[2rem] rotate-3 shadow-[0_20px_50px_rgba(8,_112,_184,_0.2)] overflow-hidden flex-shrink-0 border-4 border-white" style="background:${themeColor}">
+                                <img src="${personal.photo}" class="w-full h-full object-cover -rotate-3 scale-110">
+                            </div>` : ''}
+                            <div class="bg-white/70 backdrop-blur-xl p-8 rounded-3xl border border-white shadow-xl flex-1">
+                                <h1 class="text-[3rem] font-jakarta font-black text-slate-900 tracking-tight leading-none">${personal.name || 'NAMA LENGKAP'}</h1>
+                                <div class="mt-4 flex flex-wrap items-center gap-4">
+                                    <span class="text-sm font-bold px-4 py-2 rounded-xl text-white shadow-md shadow-${themeColor}/30" style="background: ${themeColor}">${personal.title || 'Role'}</span>
+                                    <div class="flex gap-4 text-slate-500 font-semibold text-sm bg-white/90 px-4 py-2 rounded-xl shadow-sm border border-slate-100">
+                                        ${personal.email ? `<span class="flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i>${personal.email}</span>` : ''}
+                                        ${personal.web ? `<span class="flex items-center gap-2"><i data-lucide="link" class="w-4 h-4"></i>${personal.web}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-8 flex-1 relative z-10">
+                            <div class="w-[60%] flex flex-col gap-8">
+                                ${personal.about ? `
+                                <div class="bg-white/80 backdrop-blur-lg p-8 rounded-3xl border border-white shadow-lg">
+                                    <h3 class="text-2xl font-jakarta font-black text-slate-900 mb-4 flex items-center gap-3"><span class="text-3xl">👋</span> Hello!</h3>
+                                    <p class="text-sm text-slate-700 leading-relaxed font-medium bg-white/50 p-4 rounded-xl">${personal.about}</p>
+                                </div>` : ''}
+                                
+                                ${safeExp.length > 0 ? `
+                                <div class="bg-white/80 backdrop-blur-lg p-8 rounded-3xl border border-white shadow-lg flex-1">
+                                    <h3 class="text-2xl font-jakarta font-black text-slate-900 mb-6 flex items-center gap-3"><span class="text-3xl">🚀</span> Experience</h3>
+                                    <div class="space-y-6">
+                                        ${safeExp.map(e => `
+                                            <div class="bg-white/70 p-6 rounded-2xl border border-white shadow-sm hover:shadow-md transition-all group">
+                                                <div class="flex justify-between items-start mb-2">
+                                                    <div>
+                                                        <h4 class="font-black text-slate-900 text-lg group-hover:text-blue-600 transition-colors">${e.title}</h4>
+                                                        <div class="text-sm font-bold mt-1" style="color:${themeColor}">${e.company}</div>
+                                                    </div>
+                                                    <span class="text-xs font-bold bg-white px-3 py-1.5 rounded-lg shadow-sm text-slate-500 border border-slate-100">${e.date}</span>
+                                                </div>
+                                                <p class="text-sm text-slate-600 leading-relaxed mt-3 font-medium">${e.desc}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                            
+                            <div class="w-[40%] flex flex-col gap-8">
+                                <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+                                    <div class="absolute -right-10 -top-10 w-32 h-32 rounded-full blur-2xl opacity-50" style="background:${themeColor}"></div>
+                                    <h3 class="text-xl font-jakarta font-black mb-6 flex items-center gap-3 text-white relative z-10"><span class="text-2xl">📱</span> Contact</h3>
+                                    <div class="space-y-4 text-sm font-semibold text-slate-300 relative z-10">
+                                        ${personal.phone ? `<div class="flex items-center gap-4"><div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/5 shadow-inner"><i data-lucide="phone" class="w-4 h-4 text-white"></i></div> ${personal.phone}</div>` : ''}
+                                        ${personal.email ? `<div class="flex items-center gap-4 break-all"><div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/5 shadow-inner"><i data-lucide="mail" class="w-4 h-4 text-white"></i></div> ${personal.email}</div>` : ''}
+                                        ${personal.address ? `<div class="flex items-center gap-4"><div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/5 shadow-inner"><i data-lucide="map-pin" class="w-4 h-4 text-white"></i></div> ${personal.address}</div>` : ''}
+                                        ${personal.web ? `<div class="flex items-center gap-4 break-all"><div class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/10 backdrop-blur-sm border border-white/5 shadow-inner"><i data-lucide="link" class="w-4 h-4 text-white"></i></div> ${personal.web}</div>` : ''}
+                                    </div>
+                                </div>
+                                
+                                ${skills.length > 0 ? `
+                                <div class="bg-white/80 backdrop-blur-lg p-8 rounded-3xl border border-white shadow-lg">
+                                    <h3 class="text-xl font-jakarta font-black text-slate-900 mb-5 flex items-center gap-3"><span class="text-2xl">💡</span> Superpowers</h3>
+                                    <div class="flex flex-wrap gap-2.5">
+                                        ${skills.map(s => `<span class="text-xs font-bold px-4 py-2 rounded-xl bg-white shadow-sm border border-slate-100 text-slate-700 hover:scale-105 transition-transform" style="border-bottom-width:3px; border-bottom-color:${themeColor}50">${s}</span>`).join('')}
+                                    </div>
+                                </div>` : ''}
+                                
+                                ${safeEdu.length > 0 ? `
+                                <div class="bg-white/80 backdrop-blur-lg p-8 rounded-3xl border border-white shadow-lg flex-1">
+                                    <h3 class="text-xl font-jakarta font-black text-slate-900 mb-6 flex items-center gap-3"><span class="text-2xl">🎓</span> Education</h3>
+                                    <div class="space-y-6">
+                                        ${safeEdu.map(e => `
+                                            <div class="relative pl-5 border-l-4 rounded-l-sm bg-white/50 p-3 shadow-sm border border-slate-100" style="border-left-color:${themeColor}">
+                                                <h4 class="font-black text-slate-900 text-base">${e.degree}</h4>
+                                                <div class="text-sm font-bold text-slate-500 mt-1">${e.school}</div>
+                                                <div class="text-xs font-black text-slate-400 mt-2 bg-white border border-slate-100 shadow-sm inline-block px-2 py-1 rounded">${e.date}</div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                        ${!isPremium ? watermark : ''}
+                    </div>
+                `;
+            }
+
+            cvPreview.innerHTML = htmlContent;
+            lucide.createIcons({ root: cvPreview });
+        }
+
+        function saveLocal() {
+            localStorage.setItem('cvBuilderData', JSON.stringify(cvData));
+        }
+
+        function loadLocal() {
+            const saved = localStorage.getItem('cvBuilderData');
+            if (saved) {
+                try {
+                    cvData = JSON.parse(saved);
+                    if(!cvData.experience) cvData.experience = [];
+                    if(!cvData.education) cvData.education = [];
+                } catch(e) { console.error("Parse error", e); }
+            }
+        }
+
+        async function exportPDF() {
+            const element = document.getElementById('cv-preview');
+            const opt = { scale: 2, useCORS: true, logging: false };
+            const btn = document.querySelector('button[onclick="exportPDF()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Memproses...`;
+            lucide.createIcons();
+
+            try {
+                const canvas = await html2canvas(element, opt);
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(`CV_${cvData.personal.name.replace(/\s+/g, '_') || 'Premium'}.pdf`);
+            } catch (error) {
+                alert('Gagal membuat PDF. Pastikan gambar tidak bermasalah dengan CORS.');
+                console.error(error);
+            } finally {
+                btn.innerHTML = originalText;
+                lucide.createIcons();
+            }
+        }
+
+        async function exportPNG() {
+            if (!isPremium) {
+                showUpsell();
+                return;
+            }
+            const element = document.getElementById('cv-preview');
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const link = document.createElement('a');
+            link.download = `CV_${cvData.personal.name.replace(/\s+/g, '_') || 'Premium'}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLocal();
+        });
+
+    </script>
+</body>
+</html>
